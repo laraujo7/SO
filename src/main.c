@@ -5,8 +5,7 @@
 #include <unistd.h>
 
 #include "readln.h"
-#include "contants.h"
-
+#include "constants.h"
 
 
 int fd_tmp;
