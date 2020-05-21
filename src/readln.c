@@ -42,11 +42,9 @@ ssize_t readln(Buffer *buffer, void *buf, size_t nbyte) {
     int i, j = 0, flag = 1;
 
     while (size < nbyte && flag) {
-        if (buffer->pt >= buffer->size) {
-            if (read_block(buffer, nbyte) == 0) flag = 0;
-        }
+        if (buffer->pt >= buffer->size && !read_block(buffer, nbyte)) flag = 0;
 
-        for (i = buffer->pt; i < buffer->size && flag; j++, i++, r++) {
+        for (i = buffer->pt; i < buffer->size && flag ; j++, i++, r++) {
             if (buffer->body[i] == '\n' || buffer->body[i] == '\0') {
                 buff[j] = '\0';
                 flag = 0;
@@ -58,7 +56,7 @@ ssize_t readln(Buffer *buffer, void *buf, size_t nbyte) {
         buffer->pt = i;
         size += r;
 
-        if (r == 0) flag = 0;
+        if (!r) flag = 0;
     }
 
     return size;
