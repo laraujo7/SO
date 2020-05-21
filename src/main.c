@@ -7,7 +7,6 @@
 #include "readln.h"
 #include "constants.h"
 
-
 int fd_tmp;
 
 /**
