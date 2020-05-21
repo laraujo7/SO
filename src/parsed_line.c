@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "parsed_line.h"
 
 
@@ -38,3 +39,12 @@ ssize_t readln(ParsedLine *pl){
     }
     return read_bytes;
 }
+
+/*
+int main(){
+    ParsedLine *p = (ParsedLine *) calloc(1,sizeof(ParsedLine));
+    initPL(0,p,200);
+    readln(p);
+    printf("%s\n",p->line);
+}
+*/
