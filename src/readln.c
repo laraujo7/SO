@@ -5,10 +5,11 @@
 #include <unistd.h>
 
 #include "readln.h"
-
+#include "constants.h"
+/*
 ssize_t read_block(Buffer *buffer, size_t size) {
     ssize_t r = 0;
-    buffer->pt = 0;
+    buffer->pointer = 0;
     buffer->size = 0;
 
     if (buffer->capacity < size) {
@@ -25,7 +26,7 @@ ssize_t read_block(Buffer *buffer, size_t size) {
 void create_buffer(int fd, Buffer *buffer, size_t initial_capacity) {
     buffer->fd = fd;
     buffer->size = 0;
-    buffer->pt = 0;
+    buffer->pointer = 0;
     buffer->capacity = initial_capacity;
 
     buffer->body = (char *)malloc(sizeof(char) * buffer->capacity);
@@ -39,33 +40,26 @@ ssize_t readln(Buffer *buffer, void *buf, size_t nbyte) {
     size_t size = 0;
     ssize_t r = 0;
     char *buff = (char *)buf;
-    int i, j = 0, flag = 1;
+    int i, j = 0, flag = true;
 
     while (size < nbyte && flag) {
-        if (buffer->pt >= buffer->size && !read_block(buffer, nbyte)) flag = 0;
+        if (buffer->pointer >= buffer->size && !read_block(buffer, nbyte)) flag = false;
 
-        for (i = buffer->pt; i < buffer->size && flag ; j++, i++, r++) {
+        for (i = buffer->pointer ; i < buffer->size && flag ; j++, i++, r++) {
             if (buffer->body[i] == '\n' || buffer->body[i] == '\0') {
                 buff[j] = '\0';
-                flag = 0;
+                flag = false;
             } else {
                 buff[j] = buffer->body[i];
             }
         }
 
-        buffer->pt = i;
+        buffer->pointer = i;
         size += r;
 
-        if (!r) flag = 0;
+        if (!r) flag = false;
     }
 
     return size;
 }
-
-int contaEspacos(char *string) {
-    int r = 0;
-    while (*string) {
-        if ((*(string++)) == ' ') r++;
-    }
-    return r;
-}
+*/

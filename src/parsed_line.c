@@ -5,10 +5,11 @@
 void initPL(int fd, ParsedLine *pl, size_t init_size){
     pl->fd = fd;
     pl->mem_size = init_size;
+    pl->line = calloc(pl->mem_size,sizeof(char));
 }
 
-void resizePL(ParsedLine *pl){       
-    pl->mem_size += 2 * pl->mem_size;          
+void resizePL(ParsedLine *pl, size_t init_size){       
+    pl->mem_size += init_size;          
     pl->line = realloc(pl->line, pl->mem_size);
 }
 
@@ -21,30 +22,27 @@ ssize_t readlnToPL(ParsedLine *pl){
 }
 
 ssize_t readln(ParsedLine *pl){
-    int n_bytes = 0, read_bytes = 0, found = 0;
+    int read_bytes = 0, found = false , size = 0;
     char buffer[BUFFSIZE];
 
-    read_bytes = read(pl->fd, buffer, BUFFSIZE);
+    while(!found && (read_bytes = read(pl->fd, buffer, BUFFSIZE)) > 0){
 
-    if(read_bytes<pl->mem_size)
-        resizePL(pl);
+        for(int i = 0; i < read_bytes && !found ; i++){
         
+            if(buffer[i] == '\n'){
+                buffer[i] = '\0';
+                found = true;
+            }
 
-    for(int i = 0; i < read_bytes && !found; i++){
-        if(buffer[i] == '\n'){
-            buffer[i] = '\0';
-            found=1;
-        }
+        if(read_bytes + i > pl->mem_size)
+            resizePL(pl,read_bytes);
+
         pl->line[i] = buffer[i];
+        }
     }
+
     return read_bytes;
 }
 
-/*
-int main(){
-    ParsedLine *p = (ParsedLine *) calloc(1,sizeof(ParsedLine));
-    initPL(0,p,200);
-    readln(p);
-    printf("%s\n",p->line);
-}
-*/
+
+

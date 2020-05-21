@@ -4,7 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "readln.h"
+#include "parsed_line.h"
 #include "constants.h"
 
 int fd_tmp;
@@ -61,29 +61,28 @@ int parse(char* cod, char* snd){
 
 
 int main(int argc, char* argv[]){
-    char buff[BUFSIZE];
     char *token;
     char *args[2];
     int flag = true;
-    char tmp_file[BUFSIZE];
+    char tmp_file[BUFFSIZE];
     sprintf(tmp_file, "out/tmp_%d", getpid());
     fd_tmp = open(tmp_file, O_CREAT | O_TRUNC | O_RDWR, 0666); //TRUNK apaga tudo dentro do file
 
     //o arraylist do nelson era o historico
 
-    Buffer buffer;
-    create_buffer(0, &buffer, MAX_BUFFER);
+    ParsedLine *line = (ParsedLine *) calloc(1,sizeof(ParsedLine));
+    initPL(0,line,MAX_BUFFER);
 
     if(argc == 1) {
 
-        while (readln(&buffer, buff, BUFSIZ) > 0){
-            token = strtok(buff, " ");
+        while (readln(line) > 0){
+            token = strtok(line->line, " ");
 
             if (token == NULL) flag = false;
 
             for(int i = 0 ; token != NULL && i < 2 ; i++) {
                 args[i] = strdup(token);
-                token = strtok(NULL, "'");
+                token = strtok(NULL, " ");
             }
 
             if (flag) parse(args[0],args[1]);

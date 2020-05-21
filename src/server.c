@@ -1,7 +1,7 @@
 #include "parsed_line.h"
 
 
-
+/*
 int main(int argc, char **argv){
     char *server_fifo = "server";
 
@@ -12,3 +12,4 @@ int main(int argc, char **argv){
 
     return 0;
 }
+*/
