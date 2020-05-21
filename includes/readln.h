@@ -5,7 +5,7 @@
 typedef struct buffer {
     int fd;
     int size;
-    int pt;
+    int pointer;
     size_t capacity;
     char *body;
 } Buffer;

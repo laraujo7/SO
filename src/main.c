@@ -61,7 +61,6 @@ int parse(char* cod, char* snd){
 
 
 int main(int argc, char* argv[]){
-    char *token;
     char *args[2];
     int flag = true;
     char tmp_file[BUFFSIZE];
@@ -70,25 +69,13 @@ int main(int argc, char* argv[]){
 
     //o arraylist do nelson era o historico
 
-    ParsedLine *line = (ParsedLine *) calloc(1,sizeof(ParsedLine));
-    initPL(0,line,MAX_BUFFER);
+    ParsedLine *pl = (ParsedLine *) calloc(1,sizeof(ParsedLine));
+    initPL(0,pl,MAX_BUFFER);
 
     if(argc == 1) {
 
-        while (readln(line) > 0){
-            token = strtok(line->line, " ");
-
-            if (token == NULL) flag = false;
-
-            for(int i = 0 ; token != NULL && i < 2 ; i++) {
-                args[i] = strdup(token);
-                token = strtok(NULL, " ");
-            }
-
-            if (flag) parse(args[0],args[1]);
-
-            flag = true;
-        }
+        while(readlnToPL(pl) > 0);
+            
     }
 
     else parse(argv[1],argv[2]);
