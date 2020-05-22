@@ -22,19 +22,19 @@ ssize_t readlnToPL(ParsedLine *pl){
 }
 
 ssize_t readln(ParsedLine *pl){
-    int n_bytes = 0, read_bytes = 0, found = 0, i=0;
+    int size = 0, read_bytes = 0, found = 0;
     char buffer[BUFFSIZE];
 
-    while((read_bytes = read(pl->fd, buffer, BUFFSIZE)) && !found){ 
-        if(read_bytes > pl->mem_size)
+    while(!found && (read_bytes = read(pl->fd, buffer, BUFFSIZE))){ 
+        if(size > pl->mem_size)
             resizePL(pl);
 
-        for(int j=0; i < read_bytes && !found; i++, j++){
-            if(buffer[j] == '\n'){
-                buffer[j] = '\0';
+        for(int i=0; i < read_bytes && !found; size++, i++){
+            if(buffer[i] == '\n'){
+                buffer[i] = '\0';
                 found=1;
             }
-            pl->line[i] = buffer[j];
+            pl->line[size] = buffer[i];
         }
     }
     return read_bytes;
