@@ -32,7 +32,7 @@ int main(int argc, char* argv[]){
     else {
         pl->args[0] = argv[1];
         pl->args[1] = argv[2];
-        
+
         if(validate(pl) == -1)
                 printf("Invalid comand use \"ajuda\" (option -h) for help\n");
     }

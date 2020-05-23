@@ -23,9 +23,9 @@ void initRB(int fd, ReadlnBuffer *pl, size_t init_size){
     pl->line = malloc(sizeof(char)*init_size);
 }
 
-void resizePL(ReadlnBuffer *pl){       
-    pl->mem_size += 2 * pl->mem_size;          
-    pl->line = realloc(pl->line, pl->mem_size);
+void resizeRB(ReadlnBuffer *rb){       
+    rb->mem_size += 2 * rb->mem_size;          
+    rb->line = realloc(rb->line, rb->mem_size);
 }
 
 
@@ -55,6 +55,7 @@ ssize_t readlnToPL(ReadlnBuffer* rb, ParsedLine* pl){
 }
 
 
+
 ssize_t readln(ReadlnBuffer* rb){
     int read_bytes = 0, found = false, size=0;
     char buffer[BUFFSIZE];
@@ -62,7 +63,7 @@ ssize_t readln(ReadlnBuffer* rb){
     while(!found && (read_bytes = read(rb->fd, buffer, BUFFSIZE)) > 0){ 
         
         if(size > rb->mem_size)
-            resizePL(rb);
+            resizeRB(rb);
 
         for(int i=0 ; i < read_bytes && !found ; size++, i++){
             

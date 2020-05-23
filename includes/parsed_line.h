@@ -13,13 +13,13 @@ typedef struct readln_buffer {
 } ReadlnBuffer;
 
 
-typedef struct pased_line {
+typedef struct parsed_line {
     char opt;       // i - tempo-inactividade ; m - tempo-execucao ; e - executar ; l - listar ; t - terminar ;
     char* args[2];   // r - historico ; h - ajuda ; o - output ;
 } ParsedLine;
 
 
-void initPL(int fd, ReadlnBuffer *rb, size_t init_size);
+void initRB(int fd, ReadlnBuffer *rb, size_t init_size);
 void resizeRB(ReadlnBuffer *rb);
 ssize_t readln(ReadlnBuffer *rb);
 ssize_t readlnToPL(ReadlnBuffer *rb, ParsedLine* pl);
