@@ -20,7 +20,7 @@ typedef struct pased_line {
 
 
 void initPL(int fd, ReadlnBuffer *rb, size_t init_size);
-void resizePL(ReadlnBuffer *rb);
+void resizeRB(ReadlnBuffer *rb);
 ssize_t readln(ReadlnBuffer *rb);
-ParsedLine* readlnToPL(ReadlnBuffer *rb);
+ssize_t readlnToPL(ReadlnBuffer *rb, ParsedLine* pl);
 
