@@ -1,8 +1,23 @@
 #include <stdio.h>
 #include "parsed_line.h"
 
+ssize_t validate(ParsedLine* pl){
 
-void initPL(int fd, ReadlnBuffer *pl, size_t init_size){
+    if(!strcmp(pl->args[0],"tempo-inactividade") || !strcmp(pl->args[0],"-i")) pl->opt = 'i';
+            else if(!strcmp(pl->args[0],"tempo-execucao") || !strcmp(pl->args[0],"-m")) pl->opt = 'm';
+            else if(!strcmp(pl->args[0],"executar") || !strcmp(pl->args[0],"-e")) pl->opt = 'e';
+            else if(!strcmp(pl->args[0],"listar") || !strcmp(pl->args[0],"-l")) pl->opt = 'l';
+            else if(!strcmp(pl->args[0],"terminar") || !strcmp(pl->args[0],"-t")) pl->opt = 't';
+            else if(!strcmp(pl->args[0],"historico") || !strcmp(pl->args[0],"-r")) pl->opt = 'r';
+            else if(!strcmp(pl->args[0],"ajuda") || !strcmp(pl->args[0],"-h")) pl->opt = 'h';
+            else if(!strcmp(pl->args[0],"output") || !strcmp(pl->args[0],"-o")) pl->opt = 'o';
+            else {perror("error"); return -1;}
+
+    return 0;
+}
+
+
+void initRB(int fd, ReadlnBuffer *pl, size_t init_size){
     pl->fd = fd;
     pl->mem_size = init_size;
     pl->line = malloc(sizeof(char)*init_size);
@@ -14,12 +29,12 @@ void resizePL(ReadlnBuffer *pl){
 }
 
 
-ParsedLine* readlnToPL(ReadlnBuffer* rb){
+ssize_t readlnToPL(ReadlnBuffer* rb, ParsedLine* pl){
+    ssize_t bytes_read;
     char *token;
     int flag = true;
 
-    if(readln(rb)) {
-        ParsedLine* pl = calloc(1,sizeof(ParsedLine));
+    if(bytes_read = readln(rb)) {
 
         token = strtok(rb->line, " ");
 
@@ -31,22 +46,12 @@ ParsedLine* readlnToPL(ReadlnBuffer* rb){
         }
 
         if (flag) {
-            if(!strcmp(pl->args[0],"tempo-inactividade") || !strcmp(pl->args[0],"-i")) pl->opt = 'i';
-            else if(!strcmp(pl->args[0],"tempo-execucao") || !strcmp(pl->args[0],"-m")) pl->opt = 'm';
-            else if(!strcmp(pl->args[0],"executar") || !strcmp(pl->args[0],"-e")) pl->opt = 'e';
-            else if(!strcmp(pl->args[0],"listar") || !strcmp(pl->args[0],"-l")) pl->opt = 'l';
-            else if(!strcmp(pl->args[0],"terminar") || !strcmp(pl->args[0],"-t")) pl->opt = 't';
-            else if(!strcmp(pl->args[0],"historico") || !strcmp(pl->args[0],"-r")) pl->opt = 'r';
-            else if(!strcmp(pl->args[0],"ajuda") || !strcmp(pl->args[0],"-h")) pl->opt = 'h';
-           else if(!strcmp(pl->args[0],"output") || !strcmp(pl->args[0],"-o")) pl->opt = 'o';
-            else {perror("erro"); return NULL;}
+            if(validate(pl) == -1)
+                printf("Invalid comand use \"ajuda\" (option -h) for help\n");
         }
-
-    return pl;
-
     }
 
-    return NULL;
+    return bytes_read;
 }
 
 
