@@ -21,12 +21,14 @@ int validateArg(char* arg){
     
     if(arg[0] == '\''){
         for(i=1 ; arg[i] && arg[i] != '\'' ; i++);
-
+        
         return (arg[i] == '\'' && arg[i+1] == '\0');
     }
 
-    else 
-        return (strtok(arg,"") != NULL);
+    else {
+        for(i=0 ; arg[i] && arg[i] != ' ' ; i++);
+        return arg[i] == '\0';
+    }
     
 }
 
@@ -52,20 +54,19 @@ ssize_t readlnToPL(ReadlnBuffer* rb, ParsedLine* pl){
 
         if((token = strtok(rb->line, " ")) == NULL) flag = false;
 
-/*
         if(flag && (aux = strtok(NULL,"")) != NULL){
             if((flag = validateArg(aux))) pl->arg = strdup(aux);
                 else {
                     printf("Invalid argument\n");
-                    return -1;
+                    return 0;
                 }
         }
-*/
+
 
         if(flag) {
             if(validate(token,pl) == -1){
                 printf("Invalid comand use \"ajuda\" (option -h) for help\n");
-                return -1;
+                return 0;
             }
         }
     }

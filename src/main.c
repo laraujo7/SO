@@ -25,7 +25,7 @@ int main(int argc, char* argv[]){
 
     if(argc == 1) {
             while((bytes_read = readlnToPL(rb,pl)) > 0){
-                if(bytes_read != -1) printf("%c %s\n",pl->opt,pl->arg);
+                printf("%c %s\n",pl->opt,pl->arg);
         }
     }
 
