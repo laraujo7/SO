@@ -11,7 +11,7 @@ int fd_tmp;
 
 
 int main(int argc, char* argv[]){
-    ParsedLine* pl;
+    ssize_t bytes_read;
     char tmp_file[BUFFSIZE];
     sprintf(tmp_file, "out/tmp_%d", getpid());
     fd_tmp = open(tmp_file, O_CREAT | O_TRUNC | O_RDWR, 0666); //TRUNK apaga tudo dentro do file
@@ -24,16 +24,15 @@ int main(int argc, char* argv[]){
     ParsedLine* pl = calloc(1,sizeof(ParsedLine));
 
     if(argc == 1) {
-            while((pl = readlnToPL(rb,pl)) > 0){
-                printf("%s %s - %c\n",pl->args[0],pl->args[1],pl->opt);
+            while((bytes_read = readlnToPL(rb,pl)) > 0){
+                if(bytes_read != -1) printf("%c %s\n",pl->opt,pl->arg);
         }
     }
 
     else {
-        pl->args[0] = argv[1];
-        pl->args[1] = argv[2];
+        pl->arg = argv[2];
 
-        if(validate(pl) == -1)
+        if(validate(argv[1],pl) == -1)
                 printf("Invalid comand use \"ajuda\" (option -h) for help\n");
     }
 
