@@ -6,5 +6,4 @@
 #define false 0
 #define true !false
 
-
 #endif

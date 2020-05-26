@@ -6,7 +6,7 @@ typedef struct arraylist {
     unsigned int n_occupied;
     unsigned int capacity;
     unsigned long int *values;
-}*ArrayList;
+} *ArrayList;
 
 ArrayList arraylist_create();
 
