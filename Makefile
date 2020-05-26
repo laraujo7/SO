@@ -65,6 +65,6 @@ clean:
 	@echo "Cleaning..."
 	@echo ""
 	@-rm -rf $(BLD_DIR)/* $(BIN_DIR)/* $(OUT_DIR)/* $(LOG_DIR)/* \
-		$(DOC_DIR)/html $(DOC_DIR)/latex
+		$(DOC_DIR)/html $(DOC_DIR)/latex server_fifo
 	@echo ""
 	@echo "...✓ done!"

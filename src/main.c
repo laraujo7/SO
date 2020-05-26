@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "parsed_line.h"
@@ -11,6 +13,8 @@ int fd_tmp;
 
 
 int main(int argc, char* argv[]){
+    int sfifo_fd;
+    char *sfifo = "server_fifo";
     ParsedLine* pl;
     char tmp_file[BUFFSIZE];
     sprintf(tmp_file, "out/tmp_%d", getpid());
@@ -18,23 +22,34 @@ int main(int argc, char* argv[]){
 
     //o arraylist do nelson era o historico
 
+    if(mkfifo(sfifo, 0666) == -1){
+        perror("sfifo file creation");
+    } 
+
+    if((sfifo_fd = open(sfifo, O_WRONLY)) == -1) {
+        perror("sfifo open");
+        return -1;
+    }
+
     ReadlnBuffer *rb = (ReadlnBuffer *) calloc(1,sizeof(ReadlnBuffer));
     initRB(0,rb,MAX_BUFFER);
 
-    ParsedLine* pl = calloc(1,sizeof(ParsedLine));
+    pl = calloc(1,sizeof(ParsedLine));
 
     if(argc == 1) {
             while((pl = readlnToPL(rb,pl)) > 0){
                 printf("%s %s - %c\n",pl->args[0],pl->args[1],pl->opt);
+                write(sfifo, pl, sizeof(struct parsed_line));
         }
     }
-
     else {
         pl->args[0] = argv[1];
         pl->args[1] = argv[2];
 
         if(validate(pl) == -1)
                 printf("Invalid comand use \"ajuda\" (option -h) for help\n");
+        else
+            write(sfifo, pl, sizeof(struct parsed_line));
     }
 
     close(fd_tmp);
