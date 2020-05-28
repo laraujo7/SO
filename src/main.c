@@ -1,11 +1,7 @@
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
 #include "parsed_line.h"
 #include "constants.h"
+#include "output.h"
+
 
 int fd_tmp;
 
@@ -25,15 +21,17 @@ int main(int argc, char* argv[]){
 
     if(argc == 1) {
             while((bytes_read = readlnToPL(rb,pl)) > 0){
-                printf("%c %s\n",pl->opt,pl->arg);
+                if(pl->opt == 'o') show_output(atoi(pl->arg));
+                    else save_output(pl->arg);
         }
     }
 
     else {
         pl->arg = argv[2];
-
-        if(validate(argv[1],pl) == -1)
-                printf("Invalid comand use \"ajuda\" (option -h) for help\n");
+        validate(argv[1],pl);
+        
+        if(pl->opt == 'o') show_output(atoi(pl->arg));
+            else save_output(pl->arg);
     }
 
     close(fd_tmp);

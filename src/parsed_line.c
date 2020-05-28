@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "parsed_line.h"
 
 ssize_t validate(char* token,ParsedLine* pl){
@@ -50,24 +49,18 @@ ssize_t readlnToPL(ReadlnBuffer* rb, ParsedLine* pl){
     ssize_t bytes_read;
     char *token, *aux;
 
-    if((bytes_read = readln(rb))){
+    if((bytes_read = readln(rb)) > 0){
 
         if((token = strtok(rb->line, " ")) == NULL) flag = false;
 
         if(flag && (aux = strtok(NULL,"")) != NULL){
             if((flag = validateArg(aux))) pl->arg = strdup(aux);
-                else {
-                    printf("Invalid argument\n");
-                    return 0;
-                }
+            else return -1;
         }
 
-
         if(flag) {
-            if(validate(token,pl) == -1){
-                printf("Invalid comand use \"ajuda\" (option -h) for help\n");
-                return 0;
-            }
+            if(validate(token,pl) == -1)
+                return -1;
         }
     }
 
