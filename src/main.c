@@ -15,7 +15,7 @@ int fd_tmp;
 int main(int argc, char* argv[]){
     int sfifo_fd;
     char *sfifo = "server_fifo";
-    ParsedLine* pl;
+    ssize_t bytes_read;
     char tmp_file[BUFFSIZE];
     sprintf(tmp_file, "out/tmp_%d", getpid());
     fd_tmp = open(tmp_file, O_CREAT | O_TRUNC | O_RDWR, 0666); //TRUNK apaga tudo dentro do file
@@ -34,19 +34,17 @@ int main(int argc, char* argv[]){
     ReadlnBuffer *rb = (ReadlnBuffer *) calloc(1,sizeof(ReadlnBuffer));
     initRB(0,rb,MAX_BUFFER);
 
-    pl = calloc(1,sizeof(ParsedLine));
+    ParsedLine *pl = calloc(1,sizeof(ParsedLine));
 
     if(argc == 1) {
-            while((pl = readlnToPL(rb,pl)) > 0){
-                printf("%s %s - %c\n",pl->args[0],pl->args[1],pl->opt);
-                write(sfifo, pl, sizeof(struct parsed_line));
+            while((bytes_read = readlnToPL(rb,pl)) > 0){
+                printf("%c %s\n",pl->opt,pl->arg);
         }
     }
     else {
-        pl->args[0] = argv[1];
-        pl->args[1] = argv[2];
+        pl->arg = argv[2];
 
-        if(validate(pl) == -1)
+        if(validate(argv[1],pl) == -1)
                 printf("Invalid comand use \"ajuda\" (option -h) for help\n");
         else
             write(sfifo, pl, sizeof(struct parsed_line));

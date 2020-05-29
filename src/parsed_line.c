@@ -1,19 +1,35 @@
 #include <stdio.h>
 #include "parsed_line.h"
 
-ssize_t validate(ParsedLine* pl){
+ssize_t validate(char* token,ParsedLine* pl){
 
-    if(!strcmp(pl->args[0],"tempo-inactividade") || !strcmp(pl->args[0],"-i")) pl->opt = 'i';
-            else if(!strcmp(pl->args[0],"tempo-execucao") || !strcmp(pl->args[0],"-m")) pl->opt = 'm';
-            else if(!strcmp(pl->args[0],"executar") || !strcmp(pl->args[0],"-e")) pl->opt = 'e';
-            else if(!strcmp(pl->args[0],"listar") || !strcmp(pl->args[0],"-l")) pl->opt = 'l';
-            else if(!strcmp(pl->args[0],"terminar") || !strcmp(pl->args[0],"-t")) pl->opt = 't';
-            else if(!strcmp(pl->args[0],"historico") || !strcmp(pl->args[0],"-r")) pl->opt = 'r';
-            else if(!strcmp(pl->args[0],"ajuda") || !strcmp(pl->args[0],"-h")) pl->opt = 'h';
-            else if(!strcmp(pl->args[0],"output") || !strcmp(pl->args[0],"-o")) pl->opt = 'o';
+    if(!strcmp(token,"tempo-inactividade") || !strcmp(token,"-i")) pl->opt = 'i';
+            else if(!strcmp(token,"tempo-execucao") || !strcmp(token,"-m")) pl->opt = 'm';
+            else if(!strcmp(token,"executar") || !strcmp(token,"-e")) pl->opt = 'e';
+            else if(!strcmp(token,"listar") || !strcmp(token,"-l")) pl->opt = 'l';
+            else if(!strcmp(token,"terminar") || !strcmp(token,"-t")) pl->opt = 't';
+            else if(!strcmp(token,"historico") || !strcmp(token,"-r")) pl->opt = 'r';
+            else if(!strcmp(token,"ajuda") || !strcmp(token,"-h")) pl->opt = 'h';
+            else if(!strcmp(token,"output") || !strcmp(token,"-o")) pl->opt = 'o';
             else {perror("error"); return -1;}
 
     return 0;
+}
+
+int validateArg(char* arg){
+    int i;
+    
+    if(arg[0] == '\''){
+        for(i=1 ; arg[i] && arg[i] != '\'' ; i++);
+        
+        return (arg[i] == '\'' && arg[i+1] == '\0');
+    }
+
+    else {
+        for(i=0 ; arg[i] && arg[i] != ' ' ; i++);
+        return arg[i] == '\0';
+    }
+    
 }
 
 
@@ -30,24 +46,28 @@ void resizeRB(ReadlnBuffer *rb){
 
 
 ssize_t readlnToPL(ReadlnBuffer* rb, ParsedLine* pl){
-    ssize_t bytes_read;
-    char *token;
     int flag = true;
+    ssize_t bytes_read;
+    char *token, *aux;
 
-    if(bytes_read = readln(rb)) {
+    if((bytes_read = readln(rb))){
 
-        token = strtok(rb->line, " ");
+        if((token = strtok(rb->line, " ")) == NULL) flag = false;
 
-        if (token == NULL) flag = false;
-
-        for(int i = 0 ; token != NULL && i < 2 ; i++) {
-            pl->args[i] = strdup(token);
-            token = strtok(NULL, "'");
+        if(flag && (aux = strtok(NULL,"")) != NULL){
+            if((flag = validateArg(aux))) pl->arg = strdup(aux);
+                else {
+                    printf("Invalid argument\n");
+                    return 0;
+                }
         }
 
-        if (flag) {
-            if(validate(pl) == -1)
+
+        if(flag) {
+            if(validate(token,pl) == -1){
                 printf("Invalid comand use \"ajuda\" (option -h) for help\n");
+                return 0;
+            }
         }
     }
 

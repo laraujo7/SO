@@ -15,7 +15,7 @@ typedef struct readln_buffer {
 
 typedef struct parsed_line {
     char opt;       // i - tempo-inactividade ; m - tempo-execucao ; e - executar ; l - listar ; t - terminar ;
-    char* args[2];   // r - historico ; h - ajuda ; o - output ;
+    char* arg;   // r - historico ; h - ajuda ; o - output ;
 } ParsedLine;
 
 
