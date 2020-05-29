@@ -1,6 +1,6 @@
 #include <fcntl.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -15,10 +15,10 @@ typedef struct readln_buffer {
 
 typedef struct parsed_line {
     char opt;       // i - tempo-inactividade ; m - tempo-execucao ; e - executar ; l - listar ; t - terminar ;
-    char* arg;   // r - historico ; h - ajuda ; o - output ;
+    char* arg;      // r - historico ; h - ajuda ; o - output ;
 } ParsedLine;
 
-
+ssize_t validate(char* token,ParsedLine* pl);
 void initRB(int fd, ReadlnBuffer *rb, size_t init_size);
 void resizeRB(ReadlnBuffer *rb);
 ssize_t readln(ReadlnBuffer *rb);
