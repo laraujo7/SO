@@ -42,15 +42,20 @@ int main(int argc, char *argv[])
                 default:
                     wait(NULL);
             }
+
+            if (close(fifo_fd) < 0) {
+                perror("close");
+                return -1;
+            }
         }
     }
 
-    if (close(log) < 0) {
-        perror("close");
+    if (fifo_fd < 0) {
+        perror("open");
         return -1;
     }
 
-    if (close(fifo_fd) < 0) {
+    if (close(log) < 0) {
         perror("close");
         return -1;
     }
