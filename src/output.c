@@ -6,7 +6,7 @@
 int save_output(char* output){
     int fd;
 
-    if((fd = open("out/log.bin", O_WRONLY | O_CREAT, 0644)) == -1){  
+    if((fd = open("out/log.bin", O_CREAT | O_WRONLY, 0644)) == -1){  
         perror("error");
         return -1;
     }
