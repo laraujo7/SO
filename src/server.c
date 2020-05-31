@@ -31,6 +31,8 @@ int main(int argc, char *argv[])
                 return -1;
             }
 
+            parse(buf);
+
             switch (fork()) {
                 case -1:
                     perror("fork");
@@ -42,11 +44,11 @@ int main(int argc, char *argv[])
                 default:
                     wait(NULL);
             }
+        }
 
-            if (close(fifo_fd) < 0) {
-                perror("close");
-                return -1;
-            }
+        if (close(fifo_fd) < 0) {
+            perror("close");
+            return -1;
         }
     }
 
