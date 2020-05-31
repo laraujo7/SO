@@ -65,15 +65,14 @@ ARGS* parse(char *buf)
     char *token;
     char *pipe_ptr, *space_ptr;
     ARGS *args;
-    int i, j;
 
     token = strtok_r(buf, "|", &pipe_ptr);
 
-    for (i = 0; token; i++) {
+    for (int i = 0; token; i++) {
         args = (ARGS *)realloc(args, (i + 1) * sizeof(ARGS));
         token = strtok_r(token, " ", &space_ptr);
 
-        for (j = 0; token; j++) {
+        for (int j = 0; token; j++) {
             args[i].argv = (char **)realloc(args[i].argv, (j + 1) * sizeof(char **));
             args[i].argv[j] = token;
 
@@ -83,5 +82,5 @@ ARGS* parse(char *buf)
         token = strtok_r(NULL, "|", &pipe_ptr);
     }
 
-    return 0;
+    return args;
 }
