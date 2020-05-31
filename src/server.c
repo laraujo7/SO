@@ -1,9 +1,4 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <fcntl.h>
+#include "server.h"
 
 int main(int argc, char *argv[])
 {
@@ -31,14 +26,14 @@ int main(int argc, char *argv[])
                 return -1;
             }
 
-            parse(buf);
+            ARGS *argvp = parse(buf);
 
             switch (fork()) {
                 case -1:
                     perror("fork");
                     return -1;
                 case 0:
-                    //executar(buf);
+                    //executar(argvp);
                     exit(0);
                     break;
                 default:
@@ -60,6 +55,32 @@ int main(int argc, char *argv[])
     if (close(log) < 0) {
         perror("close");
         return -1;
+    }
+
+    return 0;
+}
+
+ARGS* parse(char *buf)
+{
+    char *token;
+    char *pipe_ptr, *space_ptr;
+    ARGS *args;
+    int i, j;
+
+    token = strtok_r(buf, "|", &pipe_ptr);
+
+    for (i = 0; token; i++) {
+        args = (ARGS *)realloc(args, (i + 1) * sizeof(ARGS));
+        token = strtok_r(token, " ", &space_ptr);
+
+        for (j = 0; token; j++) {
+            args[i].argv = (char **)realloc(args[i].argv, (j + 1) * sizeof(char **));
+            args[i].argv[j] = token;
+
+            token = strtok_r(NULL, " ", &space_ptr);
+        }
+
+        token = strtok_r(NULL, "|", &pipe_ptr);
     }
 
     return 0;
