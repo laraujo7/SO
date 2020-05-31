@@ -21,7 +21,7 @@ ssize_t validate(char *token, ParsedLine *pl)
     else if (!strcmp(token, "output")         || !strcmp(token, "-o"))
         pl->opt = 'o';
     else {
-        perror("error");
+//        perror("error");
         return -1;
     }
 
