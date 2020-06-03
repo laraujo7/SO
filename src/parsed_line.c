@@ -74,7 +74,6 @@ ssize_t readlnToPL(ReadlnBuffer *rb, ParsedLine *pl)
         if(flag) {
             if(validate(token,pl) == -1)
                 return -1;
-
         }
     }
 

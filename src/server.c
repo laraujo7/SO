@@ -1,10 +1,10 @@
-/*
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
 
 int main(int argc, char **argv){
     int fd;
@@ -17,9 +17,4 @@ int main(int argc, char **argv){
     }
     buffer = malloc(sizeof(char) * 64);
     while( (bytes_read = read(fd,buffer,1)) );
-
-    printf("%s",(char*)buffer);
-  
-    return 0;
 }
-*/

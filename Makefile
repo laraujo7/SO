@@ -1,6 +1,7 @@
 CC      = gcc
 LD      = gcc
-CFLAGS  = -O2 -Wall -Wno-unused-parameter -Wno-unused-function -Wno-unused-result
+CFLAGS  = -O2 -Wall -Wextra -g
+CFLAGS += -Wno-unused-parameter -Wno-unused-function -Wno-unused-result
 INCLDS  = -I $(INC_DIR)
 BIN_DIR = bin
 BLD_DIR = build
@@ -9,31 +10,29 @@ INC_DIR = includes
 LOG_DIR = log
 OUT_DIR = out
 SRC_DIR = src
-TST_DIR = tests
-SRC     = $(wildcard $(SRC_DIR)/*.c)
-OBJS    = $(patsubst $(SRC_DIR)/%.c,$(BLD_DIR)/%.o,$(SRC))
-DEPS    = $(patsubst $(BLD_DIR)/%.o,$(BLD_DIR)/%.d,$(OBJS))
-PROGRAM = so
+TST_DIR = scripts
+TARGETS = cl sv
 
-vpath %.c $(SRC_DIR)
+.DEFAULT_GOAL = all
 
-.DEFAULT_GOAL = build
+.PHONY: $(TARGETS) all check checkdirs clean doc fmt lint test
 
-.PHONY: build setup clean debug doc fmt lint run test
+all: checkdirs $(TARGETS)
 
-$(BLD_DIR)/%.d: %.c
-	$(CC) -M $(INCLDS) $(CFLAGS) $< -o $@ $(LIBS)
+$(BLD_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) -c $(INCLDS) $(CFLAGS) $< -o $@
 
-$(BLD_DIR)/%.o: %.c
-	$(CC) -c $(INCLDS) $(CFLAGS) $< -o $@ $(LIBS)
+cl: $(BLD_DIR)/io.o $(BLD_DIR)/arraylist.o
+	$(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/client.c $^
 
-$(BIN_DIR)/$(PROGRAM): $(DEPS) $(OBJS)
-	$(CC) $(INCLDS) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
+sv: $(BLD_DIR)/io.o
+	$(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/server.c $^
 
-build: setup $(BIN_DIR)/$(PROGRAM)
+start: all
+	./$(BIN_DIR)/sv
 
-run: build
-	@./$(BIN_DIR)/$(PROGRAM)
+stop:
+	kill -s SIGTERM $(shell pidof sv)
 
 fmt:
 	@echo "C and Headers files:"
@@ -47,14 +46,18 @@ lint:
 	@splint -retvalint -hints -I $(INC_DIR) \
 		$(SRC_DIR)/*
 
-debug: CFLAGS = -Wall -Wextra -pedantic -O0 -g
-debug: build
-	gdb ./$(BIN_DIR)/$(PROGRAM)
+check: all
+	@echo "Write something to check!"
 
 doc:
-	@den $(DOC_DIR)/Doxyfile
+	@doxygen $(DOC_DIR)/Doxyfile
 
-setup:
+test: all
+	./$(TST_DIR)/test_manutencao.sh
+	./$(TST_DIR)/test_agregador.sh
+	./$(TST_DIR)/test_cliente.sh
+
+checkdirs:
 	@mkdir -p $(BIN_DIR)
 	@mkdir -p $(BLD_DIR)
 	@mkdir -p $(DOC_DIR)
@@ -64,6 +67,7 @@ setup:
 clean:
 	@echo "Cleaning..."
 	@echo ""
+	@cat .art/maid.ascii
 	@-rm -rf $(BLD_DIR)/* $(BIN_DIR)/* $(OUT_DIR)/* $(LOG_DIR)/* \
 		$(DOC_DIR)/html $(DOC_DIR)/latex
 	@echo ""
