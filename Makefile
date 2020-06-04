@@ -7,7 +7,6 @@ BIN_DIR = bin
 BLD_DIR = build
 DOC_DIR = docs
 INC_DIR = includes
-LOG_DIR = log
 OUT_DIR = out
 SRC_DIR = src
 TST_DIR = scripts
@@ -22,10 +21,10 @@ all: checkdirs $(TARGETS)
 $(BLD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) -c $(INCLDS) $(CFLAGS) $< -o $@
 
-cl: $(BLD_DIR)/io.o $(BLD_DIR)/arraylist.o
+cl: $(BLD_DIR)/parsed_line.o
 	$(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/client.c $^
 
-sv: $(BLD_DIR)/io.o
+sv:
 	$(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/server.c $^
 
 start: all
@@ -52,16 +51,10 @@ check: all
 doc:
 	@doxygen $(DOC_DIR)/Doxyfile
 
-test: all
-	./$(TST_DIR)/test_manutencao.sh
-	./$(TST_DIR)/test_agregador.sh
-	./$(TST_DIR)/test_cliente.sh
-
 checkdirs:
 	@mkdir -p $(BIN_DIR)
 	@mkdir -p $(BLD_DIR)
 	@mkdir -p $(DOC_DIR)
-	@mkdir -p $(LOG_DIR)
 	@mkdir -p $(OUT_DIR)
 
 clean:
