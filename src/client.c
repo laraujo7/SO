@@ -17,21 +17,25 @@ void crtl_c_handler(int signum)
     exit(0);
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     signal(SIGINT, crtl_c_handler);
 
-    int sfifo_fd;
-    char *sfifo = "server_fifo";
+    int cfifo_fd;
     ssize_t bytes_read;
 
-
-    if(mkfifo(sfifo, 0666) == -1){
-        perror("sfifo file creation");
+    if (mkfifo("client_fifo", 0666) == -1) {
+        perror("mkfifo");
+        return(-1);
     } 
 
-    if((sfifo_fd = open(sfifo, O_WRONLY)) == -1) {
-        perror("sfifo open");
+    if ((cfifo_fd = open("client_fifo", O_RDONLY)) == -1) {
+        perror("open");
+        return -1;
+    }
+
+    if ((sfifo_fd = open("server_fifo", O_WRONLY)) == -1) {
+        perror("open");
         return -1;
     }
 
@@ -42,7 +46,7 @@ int main(int argc, char* argv[])
 
     if (argc == 1) {
         while ((bytes_read = readlnToPL(rb, pl)) > 0) {
-        if ((sfifo_fd = open(sfifo, O_WRONLY)) == -1) return -1;
+            
             write(sfifo_fd, &pl, sizeof(ParsedLine));
             close(sfifo_fd);
         }
