@@ -1,4 +1,4 @@
-#include "parsed_line.h"
+#include "../includes/parsed_line.h"
 
 // Valerá a pena dividir esta função em duas, comando e opção, para simplificar estes if statements e aproveitar o facto de as opçoes serem apenas um char? (utilizar switch)
 // A cena de alinhar os || foi só para facilitar a leitura. Se não for divido em duas funções põe-se isso direito outra vez.
@@ -62,17 +62,20 @@ ssize_t readlnToPL(ReadlnBuffer *rb, ParsedLine *pl)
     ssize_t bytes_read;
     char *token, *aux;
 
-    if((bytes_read = readln(rb)) > 0){
+    if ((bytes_read = readln(rb)) > 0) {
+        if ((token = strtok(rb->line, " ")) == NULL)
+            flag = false;
 
-        if((token = strtok(rb->line, " ")) == NULL) flag = false;
-
-        if(flag && (aux = strtok(NULL,"")) != NULL){
-            if((flag = validateArg(aux))) pl->arg = strdup(aux);
-            else return -1;
+        if (flag && (aux = strtok(NULL, "")) != NULL) {
+            if ((flag = validateArg(aux)))
+                //pl->arg = strdup(aux); HHEEEEEYYOUUUUU
+                strcpy(pl->arg, aux);
+            else
+                return -1;
         }
 
-        if(flag) {
-            if(validate(token,pl) == -1)
+        if (flag) {
+            if (validate(token, pl) == -1)
                 return -1;
         }
     }

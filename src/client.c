@@ -1,13 +1,14 @@
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <string.h>
+#include <fcntl.h>
+#include <stdio.h>
 
-#include "parsed_line.h"
-#include "constants.h"
+#include "../includes/parsed_line.h"
+#include "../includes/constants.h"
 
 void help_func();
 
@@ -21,7 +22,7 @@ int main(int argc, char *argv[])
 {
     signal(SIGINT, crtl_c_handler);
 
-    int cfifo_fd;
+    int cfifo_fd, sfifo_fd;
     ssize_t bytes_read;
 
     if (mkfifo("client_fifo", 0666) == -1) {
@@ -29,12 +30,12 @@ int main(int argc, char *argv[])
         return(-1);
     } 
 
-    if ((cfifo_fd = open("client_fifo", O_RDONLY)) == -1) {
+    if ((sfifo_fd = open("server_fifo", O_WRONLY)) == -1) {
         perror("open");
         return -1;
     }
 
-    if ((sfifo_fd = open("server_fifo", O_WRONLY)) == -1) {
+    if ((cfifo_fd = open("client_fifo", O_RDONLY)) == -1) {
         perror("open");
         return -1;
     }
@@ -42,19 +43,26 @@ int main(int argc, char *argv[])
     ReadlnBuffer *rb = (ReadlnBuffer *)calloc(1, sizeof(ReadlnBuffer));
     initRB(0, rb, MAX_BUFFER);
 
-    ParsedLine *pl = calloc(1, sizeof(ParsedLine));
+    //ParsedLine *pl = calloc(1, sizeof(ParsedLine));
+    ParsedLine pl;
 
     if (argc == 1) {
-        while ((bytes_read = readlnToPL(rb, pl)) > 0) {
+        while ((bytes_read = readlnToPL(rb, &pl)) > 0) {
             write(sfifo_fd, &pl, sizeof(ParsedLine));
         }
     } else {
-        pl->arg = argv[2];
+        pl.opt = argv[1][1];
+        //pl->arg = argv[2];
+        strcpy(pl.arg, argv[2]);
+        printf("argv: %s\n", argv[2]);
+        printf("pl1: %s\n", pl.arg);
 
-        if (validate(argv[1], pl) == -1)
-            printf("Invalid comand use \"ajuda\" (option -h) for help\n");
-        else
-            write(sfifo_fd, pl, sizeof(struct parsed_line));
+        //if (validate(argv[1], &pl) == -1)
+        //    printf("Invalid comand use \"ajuda\" (option -h) for help\n");
+        //else {
+            printf("pl2: %s\n", pl.arg);
+            write(sfifo_fd, &pl, sizeof(ParsedLine));
+        //}
     }
 
     if (close(cfifo_fd) == -1) {

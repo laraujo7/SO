@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <limits.h>
 
 #include "constants.h"
 
@@ -12,15 +13,13 @@ typedef struct readln_buffer {
     char *line;
 } ReadlnBuffer;
 
-
 typedef struct parsed_line {
-    char opt;       // i - tempo-inactividade ; m - tempo-execucao ; e - executar ; l - listar ; t - terminar ;
-    char* arg;      // r - historico ; h - ajuda ; o - output ;
+    char opt;           // i - tempo-inactividade ; m - tempo-execucao ; e - executar ; l - listar ; t - terminar ;
+    char arg[4096];  // r - historico ; h - ajuda ; o - output ;
 } ParsedLine;
 
-ssize_t validate(char* token,ParsedLine* pl);
+ssize_t validate(char *token, ParsedLine *pl);
 void initRB(int fd, ReadlnBuffer *rb, size_t init_size);
 void resizeRB(ReadlnBuffer *rb);
 ssize_t readln(ReadlnBuffer *rb);
-ssize_t readlnToPL(ReadlnBuffer *rb, ParsedLine* pl);
-
+ssize_t readlnToPL(ReadlnBuffer *rb, ParsedLine *pl);
