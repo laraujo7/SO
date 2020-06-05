@@ -46,9 +46,7 @@ int main(int argc, char *argv[])
 
     if (argc == 1) {
         while ((bytes_read = readlnToPL(rb, pl)) > 0) {
-            
             write(sfifo_fd, &pl, sizeof(ParsedLine));
-            close(sfifo_fd);
         }
     } else {
         pl->arg = argv[2];
@@ -59,12 +57,21 @@ int main(int argc, char *argv[])
             write(sfifo_fd, pl, sizeof(struct parsed_line));
     }
 
+    if (close(cfifo_fd) == -1) {
+        perror("close");
+        return -1;
+    }
+    if (unlink("client_fifo") == -1) {
+        perror("unlink");
+        return -1;
+    }
+
     return 0;
 }
 
 void help_func()
 {
-    for (int i = 0 ; i < 7 ; i++) {
+    for (int i = 0; i < 7; i++) {
         write(0, help[i], sizeof(strlen(help[i]) * sizeof(char)));
     }
 }
