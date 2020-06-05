@@ -60,7 +60,6 @@ checkdirs:
 clean:
 	@echo "Cleaning..."
 	@echo ""
-	@cat .art/maid.ascii
 	@-rm -r $(BLD_DIR)/* $(BIN_DIR)/* $(OUT_DIR)/* $(DOC_DIR)/*
 	@echo ""
 	@echo "...✓ done!"
