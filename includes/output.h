@@ -1,21 +1,20 @@
-#ifndef SAVE_OUTPUT_H
-#define SAVE_OUTPUT_H
+#ifndef OUTPUT_H
+#define OUTPUT_H
 
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
 
-typedef struct output{
+#include "constants.h"
+#include "parsed_line.h"
+
+typedef struct output {
     size_t tam;
     int pointer;
-}Output;
+} Output;
 
-
-int save_output(char* output);
-
+int save_output(char *output);
 int save_index_output(int pt, size_t tam);
-
 int show_output(int index);
 
-
-#endif
+#endif //OUTPUT_H

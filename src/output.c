@@ -1,7 +1,4 @@
-#include "constants.h"
 #include "output.h"
-#include "parsed_line.h"
-
 
 int save_output(char* output){
     int fd;
