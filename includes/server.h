@@ -1,3 +1,6 @@
+#ifndef SERVER_H
+#define SERVER_H
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
@@ -7,7 +10,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#include "parsed_line.h"
 #include "server_funcs.h"
+#include "parsed_line.h"
 
-int interpreter(ParsedLine request);
+#endif //SERVER_H

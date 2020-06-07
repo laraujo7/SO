@@ -24,7 +24,7 @@ $(BLD_DIR)/%.o: $(SRC_DIR)/%.c
 cl: $(BLD_DIR)/parsed_line.o
 	$(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/client.c $^
 
-sv:
+sv: $(BLD_DIR)/server_funcs.o
 	$(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/server.c $^
 
 start: all
@@ -56,12 +56,3 @@ checkdirs:
 	@mkdir -p $(BLD_DIR)
 	@mkdir -p $(DOC_DIR)
 	@mkdir -p $(OUT_DIR)
-
-clean:
-	@echo "Cleaning..."
-	@echo ""
-	@cat .art/maid.ascii
-	@-rm -rf $(BLD_DIR)/* $(BIN_DIR)/* $(OUT_DIR)/* $(LOG_DIR)/* \
-		$(DOC_DIR)/html $(DOC_DIR)/latex
-	@echo ""
-	@echo "...✓ done!"

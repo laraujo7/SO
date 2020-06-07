@@ -1,4 +1,42 @@
-#include "../includes/server_funcs.h"
+#include "server_funcs.h"
+
+int interpret(ParsedLine request)
+{
+    int n;
+    int input;
+    char *endptr;
+    char *argv[256][256];
+
+    switch (request.opt) { // e i l m o t r 
+        case 'i': // tempo inatividade
+            input = (int)strtol(request.arg, &endptr, 10);
+            if (*endptr)
+                return -1;
+            return time_inactivity(input);
+        case 'm': // tempo execucao
+            input = (int)strtol(request.arg, &endptr, 10);
+            if (*endptr)
+                return -1;
+            return time_execution(input);
+        case 'e': // executar tarefa
+            n = parse(request.arg, argv);
+            return execute(argv, n);
+        case 'o': // output
+            input = (int)strtol(request.arg, &endptr, 10);
+            if (*endptr)
+                return -1;
+            return output(input);
+        case 'l': case 'r': // listar tarefas em execucao
+            return list_tasks(request.opt);
+        case 't': // terminar tarefa
+            input = (int)strtol(request.arg, &endptr, 10);
+            if (*endptr)
+                return -1;
+            return terminate_task(input);
+    }
+
+    return -1;
+}
 
 int time_inactivity(int sec)
 {
@@ -34,7 +72,7 @@ int parse(char *buf, char *args[256][256])
     return i;
 }
 
-int execution(int n, char *argv[256][256])
+int execute(char *argv[256][256], int n)
 {
     int beforePipe = 0;
     int afterPipe[2];
