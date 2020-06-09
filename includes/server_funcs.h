@@ -11,6 +11,7 @@
 #include <fcntl.h>
 
 #include "parsed_line.h"
+#include "execute.h"
 #include "server.h"
 
 int process(ParsedLine request);

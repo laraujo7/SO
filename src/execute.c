@@ -1,4 +1,4 @@
-#include "executar.h"
+#include "execute.h"
 
 extern TASKLIST tasks;
 
@@ -13,57 +13,63 @@ int execute(char *argv[256][256], int n)
     close(log_fd);
 
     pid_t pid;
+
     switch (pid = fork()) {
         case -1:
             perror("fork");
             return -1;
         case 0:
-            for (int i = 0; i < n; i++) {
-                if (i < n - 1)
-                    pipe(afterPipe);
+            piping(argv, n);
+    }
 
-                switch (fork()) {
-                    case -1:
-                        perror("fork");
-                        return -1;
-                    case 0:
-                        if (i > 0) {
-                            dup2(beforePipe, 0);
-                            close(beforePipe);
-                        }
+    return 0;
+}
 
-                        if (i < n - 1) {
-                            dup2(afterPipe[1], 1);
-                            close(afterPipe[0]);
-                            close(afterPipe[1]);
-                        }
+int piping()
+{
+    for (int i = 0; i < n; i++) {
+        if (i < n - 1)
+            pipe(afterPipe);
 
-                        if (execv(argv[i][0], argv[i]) < 0) {
-                            perror("execvp");
-                            return -1;
-                        }
-
-                        break;
-                        /*
-                    default:
-                        int status;
-                        wait(&status);
-                        */
-
-                        //alarm_inac(10);
+        switch (fork()) {
+            case -1:
+                perror("fork");
+                return -1;
+            case 0:
+                if (i > 0) {
+                    dup2(beforePipe, 0);
+                    close(beforePipe);
                 }
 
-                if (i < n - 1)
+                if (i < n - 1) {
+                    dup2(afterPipe[1], 1);
+                    close(afterPipe[0]);
                     close(afterPipe[1]);
+                }
 
-                if (i > 0)
-                    close(beforePipe);
+                if (execv(argv[i][0], argv[i]) < 0) {
+                    perror("execvp");
+                    return -1;
+                }
 
-                beforePipe = afterPipe[0];
-            }
+                break;
+                /*
+            default:
+                int status;
+                wait(&status);
+                */
+
+                //alarm_inac(10);
+        }
+
+        if (i < n - 1)
+            close(afterPipe[1]);
+
+        if (i > 0)
+            close(beforePipe);
+
+        beforePipe = afterPipe[0];
     }
- 
-    return 0;
 }
 
 int parse(char *buf, char *args[256][256])

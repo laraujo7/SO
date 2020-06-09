@@ -5,7 +5,7 @@ int cfifo_fd;
 
 TASKLIST tasks;
 
-void ctrl_c_handler(int signum)
+void sigint_handler(int signum)
 {
     printf("\n\"Unlinking\" server fifo...\n");
     if (unlink("server_fifo") == -1) {
@@ -21,7 +21,7 @@ void ctrl_c_handler(int signum)
 
 int main(int argc, char *argv[])
 {
-    signal(SIGINT, ctrl_c_handler);
+    signal(SIGINT, sigint_handler);
     
     tasks.used = 0; //substituir por init xomxing
 

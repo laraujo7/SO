@@ -3,7 +3,7 @@
 int sfifo_fd;
 int cfifo_fd;
 
-void crtl_c_handler(int signum)
+void sigint_handler(int signum)
 {
     if (unlink("client_fifo") == -1) {
         perror("unlink");
@@ -15,7 +15,7 @@ void crtl_c_handler(int signum)
 
 int main(int argc, char *argv[])
 {
-    signal(SIGINT, crtl_c_handler);
+    signal(SIGINT, sigint_handler);
 
     if (mkfifo("client_fifo", 0666) == -1) {
         perror("mkfifo");
