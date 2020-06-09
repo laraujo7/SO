@@ -22,7 +22,7 @@ void sigint_handler(int signum)
 int main(int argc, char *argv[])
 {
     signal(SIGINT, sigint_handler);
-    
+
     tasks.used = 0; //substituir por init xomxing
 
     printf("Making server fifo...\n");
