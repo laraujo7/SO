@@ -82,7 +82,7 @@ int list_tasks(char type)
         if (!!(type - 'l') == !!task.status) {
             char buffer[4096];
             sprintf(buffer, "#%d%s%s\n", i + 1, status[task.status], task.task);
-            if (write(1, buffer, strlen(buffer)) < 0) {
+            if (write(1, buffer, strlen(buffer)) == -1) {
                 perror("write");
                 return -1;
             }
@@ -94,7 +94,7 @@ int list_tasks(char type)
 
 int terminate_task(int task)
 {
-    if (kill(tasks.list[task].pid, SIGKILL) < 0) {
+    if (kill(tasks.list[task].pid, SIGKILL) == -1) {
         perror("kill");
         return -1;
     }

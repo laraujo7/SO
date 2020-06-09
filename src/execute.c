@@ -14,7 +14,7 @@ int execute(char *argv[256][256], int n)
             perror("fork");
             return -1;
         case 0:
-            if (log_fd = open("log", O_WRONLY)) {
+            if ((log_fd = open("log", O_CREAT | O_APPEND | O_WRONLY, 0666)) == -1) {
                 perror("open");
                 return -1;
             }
@@ -41,9 +41,6 @@ int execute(char *argv[256][256], int n)
                             close(afterPipe[1]);
                         }
 
-                        write(1, "HEYOU", 5);
-                        write(log_fd, "HEYOU", 5);
-
                         if (execvp(argv[i][0], argv[i]) < 0) {
                             perror("execvp");
                             return -1;
@@ -67,6 +64,10 @@ int execute(char *argv[256][256], int n)
 
                 beforePipe = afterPipe[0];
             }
+
+            _exit(0);
+        default:
+            //waitpid(-1, NULL, WNOHANG);
     }
 
     return 0;
