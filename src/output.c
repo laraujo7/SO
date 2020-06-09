@@ -1,29 +1,9 @@
 #include "output.h"
 
-int save_output(char* output){
-    int fd;
-
-    if((fd = open("out/log.bin", O_CREAT | O_WRONLY, 0644)) == -1){  
-        perror("error");
-        return -1;
-    }
-
-    size_t size = strlen(output) * sizeof(char);
-
-    save_index_output(lseek(fd,0,SEEK_END), size);
-
-    write(fd,output,size);
-
-    close(fd);
-
-    return 0;
-}
-
-
 int save_index_output(int pt, size_t tam){
     int fd;
 
-    if((fd = open("out/log.idx", O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1){  
+    if((fd = open("out/log.idx", O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1){
         perror("error");
         return -1;
     }
@@ -70,14 +50,13 @@ int show_output(int index){
         perror("error");
         return -1;
     }
-        
+
     char* output = calloc(aux.tam + 1, sizeof(char));
 
     if(read(fd,output,aux.tam) > 0){
         printf("%s\n",output);
         close(fd);
     }
-    
 
     close(fd_idx);
 

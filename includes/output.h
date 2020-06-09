@@ -13,7 +13,6 @@ typedef struct output {
     int pointer;
 } Output;
 
-int save_output(char *output);
 int save_index_output(int pt, size_t tam);
 int show_output(int index);
 
