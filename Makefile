@@ -27,8 +27,11 @@ cl: $(BLD_DIR)/parsed_line.o
 sv: $(BLD_DIR)/server_funcs.o
 	$(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/server.c $^
 
-start: all
+start_sv: all
 	./$(BIN_DIR)/sv
+
+start_cl: all
+	./$(BIN_DIR)/cl
 
 stop:
 	kill -s SIGTERM $(shell pidof sv)

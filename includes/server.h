@@ -12,5 +12,6 @@
 
 #include "server_funcs.h"
 #include "parsed_line.h"
+#include "constants.h"
 
 #endif //SERVER_H
