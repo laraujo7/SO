@@ -11,12 +11,11 @@
 #include <fcntl.h>
 
 #include "parsed_line.h"
+#include "server.h"
 
-int interpret(ParsedLine request);
-int parse(char *buf, char *args[256][256]);
+int process(ParsedLine request);
 int time_inactivity(int sec);
 int time_execution(int sec);
-int execute(char *argv[256][256], int n);
 int output(int task);
 int list_tasks(char type);
 int terminate_task(int task);

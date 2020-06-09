@@ -3,6 +3,8 @@
 int sfifo_fd;
 int cfifo_fd;
 
+TASKLIST tasks;
+
 void ctrl_c_handler(int signum)
 {
     printf("\n\"Unlinking\" server fifo...\n");
@@ -20,6 +22,8 @@ void ctrl_c_handler(int signum)
 int main(int argc, char *argv[])
 {
     signal(SIGINT, ctrl_c_handler);
+    
+    tasks.used = 0; //substituir por init xomxing
 
     printf("Making server fifo...\n");
     if (mkfifo("server_fifo", 0666) == -1) {
@@ -45,11 +49,13 @@ int main(int argc, char *argv[])
 
         ParsedLine request;
 
-        printf("Waiting for client input...\n\n");
+        printf("Waiting for client request...\n\n");
         while (read(sfifo_fd, &request, sizeof(ParsedLine)) > 0) {
-            printf("Request received:\n\topt: %c\n\targ: %s\n\n", request.opt, request.arg);
-            interpret(request);
-            printf("Request processed.\n");
+            //printf("Request received:\n\topt: %c\n\targ: %s\n\n", request.opt, request.arg);
+            printf("Request received:\n\topt: %c\n\n", request.opt);
+            printf("Processing request...\n");
+            process(request);
+            printf("...request processed.\n\n");
             printf("Waiting for client input...\n\n");
         }
         printf("Client exited.\n\n");
