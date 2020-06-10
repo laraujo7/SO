@@ -12,6 +12,20 @@
 
 #include "server_funcs.h"
 #include "parsed_line.h"
-#include "constants.h"
+#include "execute.h"
+
+typedef enum {running, concluded, max_inactivity, max_execution, terminated} STATUS;
+
+typedef struct task {
+    int index;
+    pid_t pid;
+    STATUS status;
+    char *task;
+} TASK;
+
+typedef struct tasklist {
+    int used;
+    TASK list[4096];
+} TASKLIST;
 
 #endif //SERVER_H

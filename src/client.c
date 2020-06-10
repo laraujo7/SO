@@ -3,7 +3,7 @@
 int sfifo_fd;
 int cfifo_fd;
 
-void crtl_c_handler(int signum)
+void sigint_handler(int signum)
 {
     printf("\n\"Unlinking\" client fifo...\n");
     if (unlink(CLIENT) == -1) {
@@ -17,7 +17,7 @@ void crtl_c_handler(int signum)
 
 int main(int argc, char *argv[])
 {
-    signal(SIGINT, crtl_c_handler);
+    signal(SIGINT, sigint_handler);
 
     printf("Making client fifo...\n");
     if (mkfifo(CLIENT, 0666) == -1) {
@@ -48,8 +48,22 @@ int main(int argc, char *argv[])
     ParsedLine pl;
 
     if (argc == 1) {
-        while (readlnToPL(rb, &pl) > 0) {
-            write(sfifo_fd, &pl, sizeof(ParsedLine));
+        //printf("argus$ ");
+        ssize_t bytes_read = 1;
+        /*
+        while ((bytes_read = readlnToPL(rb, &pl)) > 0) {
+            if (bytes_read > 1)
+                write(sfifo_fd, &pl, sizeof(ParsedLine));
+            printf("argus$ ");
+        }
+        */
+
+        char *prompt = "argus$ ";
+
+        while (bytes_read) {
+            write(1, prompt, strlen(prompt));
+            if ((bytes_read = readlnToPL(rb, &pl)) > 1)
+                write(sfifo_fd, &pl, sizeof(ParsedLine));
         }
     } else {
         pl.opt = argv[1][1];
@@ -57,9 +71,9 @@ int main(int argc, char *argv[])
         strcpy(pl.arg, argv[2]);
 
         if (validate(argv[1], &pl) == -1) {
-            printf("Invalid comand use \"ajuda\" (option -h) for help\n");
+            char *invalid = "Invalid comand use \"ajuda\" (option -h) for help\n";
+            write(1, invalid, strlen(invalid));
         } else {
-            printf("pl2: %s\n", pl.arg);
             write(sfifo_fd, &pl, sizeof(ParsedLine));
         }
     }
