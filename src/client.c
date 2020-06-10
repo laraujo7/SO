@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     if (mkfifo("client_fifo", 0666) == -1) {
         perror("mkfifo");
         return(-1);
-    } 
+    }
 
     if ((sfifo_fd = open("server_fifo", O_WRONLY)) == -1) {
         perror("open");
@@ -39,22 +39,38 @@ int main(int argc, char *argv[])
     ParsedLine pl;
 
     if (argc == 1) {
-        //printf("argus$ ");
         ssize_t bytes_read = 1;
-        /*
-        while ((bytes_read = readlnToPL(rb, &pl)) > 0) {
-            if (bytes_read > 1)
-                write(sfifo_fd, &pl, sizeof(ParsedLine));
-            printf("argus$ ");
-        }
-        */
-
-        char *prompt = "argus$ ";
-
         while (bytes_read) {
-            write(1, prompt, strlen(prompt));
-            if ((bytes_read = readlnToPL(rb, &pl)) > 1)
-                write(sfifo_fd, &pl, sizeof(ParsedLine));
+            char *prompt = "argus$ ";
+            if (write(STDIN_FILENO, prompt, strlen(prompt)) == -1) {
+                perror("write");
+                return -1;
+            }
+            if ((bytes_read = readlnToPL(rb, &pl)) > 1) {
+                if (write(sfifo_fd, &pl, sizeof(ParsedLine)) == -1) {
+                    perror("write");
+                    return -1;
+                }
+
+                char response[4096];
+                ssize_t bytes_output;
+
+                do {
+                    if ((bytes_output = read(cfifo_fd, &response, 4096)) == -1) {
+                        perror("read");
+                        return -1;
+                    }
+                    if (write(STDOUT_FILENO, response, bytes_output) == -1) {
+                        perror("write");
+                        return -1;
+                    }
+                } while (bytes_output == 4096);
+
+                if (bytes_output == -1) {
+                    perror("read");
+                    return -1;
+                }
+            }
         }
     } else {
         pl.opt = argv[1][1];
@@ -85,20 +101,4 @@ int main(int argc, char *argv[])
     }
 
     return 0;
-}
-
-void help_func()
-{
-    char *help[7] = {
-        "tempo-inactividade segs\n",
-        "tempo-execucao segs\n",
-        "executar p1 | p2 ... | pn\n",
-        "terminar segs\n",
-        "historico\n",
-        "ajudar\n",
-        "output segs\n",
-    };
-
-    for (int i = 0; i < 7; i++)
-        write(0, help[i], sizeof(strlen(help[i]) * sizeof(char)));
 }

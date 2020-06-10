@@ -13,6 +13,8 @@
 #include "server_funcs.h"
 #include "server.h"
 
+int add_idx();
+void add_task(char *buf);
 int parse(char *buf, char *args[256][256]);
 int execute(char *argv[256][256], int n);
 

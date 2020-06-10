@@ -13,6 +13,4 @@
 #include "parsed_line.h"
 #include "constants.h"
 
-void help_func();
-
 #endif //CLIENT_H

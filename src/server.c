@@ -2,7 +2,6 @@
 
 int sfifo_fd;
 int cfifo_fd;
-
 TASKLIST tasks;
 
 void sigint_handler(int signum)

@@ -14,11 +14,17 @@
 #include "execute.h"
 #include "server.h"
 
+typedef struct logidx {
+    int size;
+    int offset;
+} LOGIDX;
+
 int process(ParsedLine request);
-int time_inactivity(int sec);
-int time_execution(int sec);
+void time_inactivity(int sec);
+void time_execution(int sec);
 int output(int task);
 int list_tasks(char type);
 int terminate_task(int task);
+int help();
 
 #endif //SERVER_FUNCS_H

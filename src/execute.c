@@ -1,6 +1,48 @@
 #include "execute.h"
 
+extern int cfifo_fd;
+extern int time_inact;
+extern int time_exec;
 extern TASKLIST tasks;
+
+int add_idx()
+{
+    int idx_fd;
+    idx_fd = open("log.idx", O_CREAT | O_WRONLY, 0640);
+
+    int offset;
+    offset = lseek(idx_fd, 0, SEEK_END);
+
+    LOGIDX idx;
+    idx.offset = offset;
+    write(idx_fd, &idx, sizeof(idx));
+
+    close(idx_fd);
+
+    return 0;
+}
+
+int idx_set_size(int index, int size)
+{
+    int idx_fd;
+    idx_fd = open("log.idx", O_CREAT | O_WRONLY, 0640);
+    lseek(idx_fd, index * sizeof(LOGIDX), SEEK_SET);
+
+    LOGIDX idx;
+    idx.size = size;
+    write(idx_fd, &idx, sizeof(idx));
+
+    close(idx_fd);
+
+    return 0;
+}
+
+void add_task(char *buf)
+{
+    tasks.list[tasks.used].task = buf;
+    tasks.list[tasks.used].status = running;
+    tasks.used++;
+}
 
 int execute(char *argv[256][256], int n)
 {
@@ -47,12 +89,12 @@ int execute(char *argv[256][256], int n)
                         }
 
                         break;
-                        /*
+                    /*
                     default:
+                        alarm(sec);
                         int status;
                         wait(&status);
-                        */
-
+                    */
                         //alarm_inac(10);
                 }
 
@@ -66,9 +108,21 @@ int execute(char *argv[256][256], int n)
             }
 
             _exit(0);
-        default:
+        //default:
             //waitpid(-1, NULL, WNOHANG);
     }
+
+    write(cfifo_fd, "feito I guess\n", 14);
+
+    int idx_fd;
+    idx_fd = open("log.idx", O_CREAT | O_WRONLY, 0640);
+
+    int offset;
+    offset = lseek(idx_fd, 0, SEEK_END);
+
+    close(idx_fd);
+
+    idx_set_size(tasks.used, offset);
 
     return 0;
 }
