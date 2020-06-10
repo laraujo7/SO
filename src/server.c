@@ -7,7 +7,7 @@ TASKLIST tasks;
 void sigint_handler(int signum)
 {
     printf("\n\"Unlinking\" server fifo...\n");
-    if (unlink("server_fifo") == -1) {
+    if (unlink(SERVER) == -1) {
         perror("unlink");
         exit(-1);
     }
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     tasks.used = 0; //substituir por init xomxing
 
     printf("Making server fifo...\n");
-    if (mkfifo("server_fifo", 0666) == -1) {
+    if (mkfifo(SERVER, 0666) == -1) {
         perror("mkfifo");
         return -1;
     }
@@ -33,14 +33,14 @@ int main(int argc, char *argv[])
 
     while (1) {
         printf("Waiting for client to open server fifo...\n");
-        if ((sfifo_fd = open("server_fifo", O_RDONLY)) == -1) {
+        if ((sfifo_fd = open(SERVER, O_RDONLY)) == -1) {
             perror("open");
             return -1;
         }
         printf("...server fifo opened.\n\n");
 
         printf("Waiting for client to open client fifo...\n");
-        if ((cfifo_fd = open("client_fifo", O_WRONLY)) == -1) {
+        if ((cfifo_fd = open(CLIENT, O_WRONLY)) == -1) {
             perror("open");
             return -1;
         }
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
         printf("...server fifo closed.\n\n");
     }
 
-    if (unlink("server_fifo") == -1) {
+    if (unlink(SERVER) == -1) {
         perror("unlink");
         return -1;
     }

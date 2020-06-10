@@ -108,7 +108,8 @@ int execute(char *argv[256][256], int n)
             }
 
             _exit(0);
-        //default:
+        default:
+            break;
             //waitpid(-1, NULL, WNOHANG);
     }
 
