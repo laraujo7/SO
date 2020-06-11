@@ -51,7 +51,7 @@ void initRB(int fd, ReadlnBuffer *pl, size_t init_size)
 
 void resizeRB(ReadlnBuffer *rb)
 {
-    rb->mem_size += 2 * rb->mem_size;          
+    rb->mem_size += 2 * rb->mem_size;
     rb->line = realloc(rb->line, rb->mem_size);
 }
 
@@ -90,7 +90,7 @@ ssize_t readln(ReadlnBuffer *rb)
     int read_bytes = 0, found = false, size = 0;
     char buffer[BUFFSIZE];
 
-    while(!found && (read_bytes = read(rb->fd, buffer, BUFFSIZE)) > 0) { 
+    while(!found && (read_bytes = read(rb->fd, buffer, BUFFSIZE)) > 0) {
         if (size > rb->mem_size)
             resizeRB(rb);
 
