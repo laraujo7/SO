@@ -54,3 +54,6 @@ dkms.conf
 
 bin/
 out/
+
+log
+log.idx

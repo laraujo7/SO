@@ -89,13 +89,11 @@ int execute(char *argv[256][256], int n)
                         }
 
                         break;
-                    /*
-                    default:
-                        alarm(sec);
-                        int status;
-                        wait(&status);
-                    */
-                        //alarm_inac(10);
+                    /* default:
+                     *    alarm(sec);
+                     *    int status;
+                     *    wait(&status);
+                     *    //alarm_inac(10); */
                 }
 
                 if (i < n - 1)

@@ -9,6 +9,7 @@ int process(ParsedLine request)
 {
     int n;
     int input;
+    char *token;
     char *endptr;
     char *argv[256][256];
 
@@ -26,9 +27,10 @@ int process(ParsedLine request)
             time_execution(input);
             return 0;
         case 'e': // executar tarefa
-            add_task(request.arg);
+            token = strtok(request.arg, "'");
+            add_task(token);
             add_idx();
-            n = parse(request.arg, argv);
+            n = parse(token, argv);
             return execute(argv, n);
         case 'o': // output
             input = (int)strtol(request.arg, &endptr, 10);
