@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#include "server_funcs.h"
+#include "processor.h"
 #include "parsed_line.h"
 #include "execute.h"
 

@@ -17,47 +17,52 @@ int execute(char *argv[256][256], int n)
         return -1;
     }
 
-    for (int i = 0; i < n; i++) {
-        if (i < n - 1)
-            pipe(afterPipe);
+    if (!fork()) {
+        for (int i = 0; i < n; i++) {
+            if (i < n - 1)
+                pipe(afterPipe);
 
-        switch (fork()) {
-            case -1:
-                perror("fork");
-                return -1;
-            case 0:
-                dup2(log_fd, STDOUT_FILENO);
-                close(log_fd);
-
-                if (i > 0) {
-                    dup2(beforePipe, 0);
-                    close(beforePipe);
-                }
-                if (i < n - 1) {
-                    dup2(afterPipe[1], 1);
-                    close(afterPipe[0]);
-                    close(afterPipe[1]);
-                }
-                if (execvp(argv[i][0], argv[i])) {
-                    perror("execvp");
+            switch (fork()) {
+                case -1:
+                    perror("fork");
                     return -1;
-                }
-                break;
-            default:
-                if (i == n -1) {
-                    int offsetA, offsetB;
-                    offsetA = lseek(log_fd, 0, SEEK_END);
-                    wait(&status);
-                    offsetB = lseek(log_fd, 0, SEEK_END);
-                    idx_set(tasks.used - 1, offsetA, offsetB - offsetA);
-                }
+                case 0:
+                    dup2(log_fd, STDOUT_FILENO);
+                    close(log_fd);
+
+                    if (i > 0) {
+                        dup2(beforePipe, 0);
+                        close(beforePipe);
+                    }
+                    if (i < n - 1) {
+                        dup2(afterPipe[1], 1);
+                        close(afterPipe[0]);
+                        close(afterPipe[1]);
+                    }
+                    if (execvp(argv[i][0], argv[i])) {
+                        perror("execvp");
+                        return -1;
+                    }
+                    break;
+                default:
+                    if (i == n -1) {
+                        int offsetA, offsetB;
+                        offsetA = lseek(log_fd, 0, SEEK_END);
+                        wait(&status);
+                        offsetB = lseek(log_fd, 0, SEEK_END);
+                        idx_set(tasks.used - 1, offsetA, offsetB - offsetA);
+                        tasks.list[tasks.used - 1].status = concluded;
+                    }
+            }
+
+            if (i < n - 1)
+                close(afterPipe[1]);
+            if (i > 0)
+                close(beforePipe);
+            beforePipe = afterPipe[0];
         }
 
-        if (i < n - 1)
-            close(afterPipe[1]);
-        if (i > 0)
-            close(beforePipe);
-        beforePipe = afterPipe[0];
+        exit(0);
     }
 
     close(log_fd);
@@ -83,12 +88,15 @@ int idx_add()
 int idx_set(int index, int offset, int size)
 {
     int idx_fd;
+
     idx_fd = open("log.idx", O_RDWR);
     lseek(idx_fd, index * sizeof(LOGIDX), SEEK_SET);
 
-    LOGIDX idx;
-    idx.offset = offset;
-    idx.size = size;
+    LOGIDX idx = {
+        .offset = offset,
+        .size = size,
+    };
+
     write(idx_fd, &idx, sizeof(idx));
 
     close(idx_fd);
@@ -96,9 +104,9 @@ int idx_set(int index, int offset, int size)
     return 0;
 }
 
-void add_task(char *buf)
+void task_add(char *task)
 {
-    tasks.list[tasks.used].task = buf;
+    tasks.list[tasks.used].task = task;
     tasks.list[tasks.used].status = running;
     tasks.used++;
 }
@@ -109,7 +117,7 @@ int parse(char *buf, char *args[256][256])
     char *pipe_ptr, *space_ptr;
     int i, j;
 
-    token = strtok_r(buf, "|\n", &pipe_ptr);
+    token = strtok_r(buf, "|", &pipe_ptr);
 
     for (i = 0; token; i++) {
         token = strtok_r(token, " ", &space_ptr);
@@ -121,7 +129,7 @@ int parse(char *buf, char *args[256][256])
 
         args[i][j] = NULL;
 
-        token = strtok_r(NULL, "|\n", &pipe_ptr);
+        token = strtok_r(NULL, "|", &pipe_ptr);
     }
 
     return i;

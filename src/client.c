@@ -5,12 +5,12 @@ int cfifo_fd;
 
 void sigint_handler(int signum)
 {
-    printf("\n\"Unlinking\" client fifo...\n");
+    //printf("\n\"Unlinking\" client fifo...\n");
     if (unlink(CLIENT) == -1) {
         perror("unlink");
         exit(-1);
     }
-    printf("...client fifo \"unlinked\".\n\n");
+    //printf("...client fifo \"unlinked\".\n\n");
 
     exit(0);
 }

@@ -51,7 +51,6 @@ int main(int argc, char *argv[])
         printf("Waiting for client request...\n\n");
         while (read(sfifo_fd, &request, sizeof(ParsedLine)) > 0) {
             printf("Request received:\n\topt: %c\n\targ: %s\n\n", request.opt, request.arg);
-            //printf("Request received:\n\topt: %c\n\n", request.opt);
             printf("Processing request...\n");
             process(request);
             printf("...request processed.\n\n");

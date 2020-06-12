@@ -24,7 +24,7 @@ $(BLD_DIR)/%.o: $(SRC_DIR)/%.c
 cl: $(BLD_DIR)/parsed_line.o
 	$(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/client.c $^
 
-sv: $(BLD_DIR)/server_funcs.o $(BLD_DIR)/execute.o
+sv: $(BLD_DIR)/server_funcs.o $(BLD_DIR)/execute.o $(BLD_DIR)/processor.o
 	$(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/server.c $^
 
 start_sv: all

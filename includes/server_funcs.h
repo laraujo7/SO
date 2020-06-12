@@ -11,7 +11,6 @@
 #include <fcntl.h>
 
 #include "parsed_line.h"
-#include "execute.h"
 #include "server.h"
 
 typedef struct logidx {
@@ -19,7 +18,6 @@ typedef struct logidx {
     int size;
 } LOGIDX;
 
-int process(ParsedLine request);
 void time_inactivity(int sec);
 void time_execution(int sec);
 int output(int task);
