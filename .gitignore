@@ -57,3 +57,5 @@ out/
 
 log
 log.idx
+idx
+idx.c
