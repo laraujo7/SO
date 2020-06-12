@@ -15,8 +15,8 @@
 #include "server.h"
 
 typedef struct logidx {
-    int size;
     int offset;
+    int size;
 } LOGIDX;
 
 int process(ParsedLine request);

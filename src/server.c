@@ -20,7 +20,6 @@ void sigint_handler(int signum)
 
 int main(int argc, char *argv[])
 {
-    printf("IDX PRINCIPALMENTE COMO SABER O SIZE. PROVAVELMENTE FAZER LSEEK LOGO ANTES E LOGO A SEGUIR AO ULTIMO EXECVP\n COMUNICAÇÃO SERVER -> FIFO. METER TUDO NUMA STRING OU USAR ALGUM TIPO DE SINAL (NÃO NECESSÁRIAMENTE UM SINAL SINAL MAS TALVEZ UM SINAL SINAL\nALARM -I. FALAR COM O MARCO)");
     signal(SIGINT, sigint_handler);
 
     tasks.used = 0; //substituir por init xomxing

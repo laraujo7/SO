@@ -29,7 +29,7 @@ int process(ParsedLine request)
         case 'e': // executar tarefa
             token = strtok(request.arg, "'");
             add_task(token);
-            add_idx();
+            idx_add();
             n = parse(token, argv);
             return execute(argv, n);
         case 'o': // output
@@ -63,9 +63,9 @@ void time_execution(int sec)
 
 int output(int task)
 {
+    task--;
     int idx_fd, log_fd;
     LOGIDX idx;
-    char *response;
 
     if ((idx_fd = open("log.idx", O_RDONLY)) == -1) {
         perror("open");
@@ -80,6 +80,8 @@ int output(int task)
         return -1;
     }
 
+    char response[idx.size];
+
     if ((log_fd = open("log", O_RDONLY)) == -1) {
         perror("open");
         return -1;
@@ -93,7 +95,7 @@ int output(int task)
         return -1;
     }
 
-    if (write(cfifo_fd, response, strlen(response)) == -1) {
+    if (write(cfifo_fd, response, idx.size) == -1) {
         perror("write");
         return -1;
     }
@@ -103,6 +105,7 @@ int output(int task)
 
 int list_tasks(char type)
 {
+    /*
     tasks.list[0].task = "ls -l | wc -l";
     tasks.list[0].status = running;
     tasks.used = 1;
@@ -114,6 +117,7 @@ int list_tasks(char type)
     tasks.list[2].task = "pacman -Q | grep alsa";
     tasks.list[2].status = running;
     tasks.used = 3;
+    */
 
     char *status[5] = {
         ": ",

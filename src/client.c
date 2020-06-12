@@ -19,27 +19,27 @@ int main(int argc, char *argv[])
 {
     signal(SIGINT, sigint_handler);
 
-    printf("Making client fifo...\n");
+    //printf("Making client fifo...\n");
     if (mkfifo(CLIENT, 0666) == -1) {
         unlink(CLIENT);
         perror("mkfifo");
         return -1;
     }
-    printf("...cliente fifo done.\n\n");
+    //printf("...cliente fifo done.\n\n");
 
-    printf("Waiting for server to open server fifo...\n");
+    //printf("Waiting for server to open server fifo...\n");
     if ((sfifo_fd = open(SERVER, O_WRONLY)) == -1) {
         perror("open");
         return -1;
     }
-    printf("...server fifo opened.\n\n");
+    //printf("...server fifo opened.\n\n");
 
-    printf("Waiting for server to open client fifo...\n");
+    //printf("Waiting for server to open client fifo...\n");
     if ((cfifo_fd = open(CLIENT, O_RDONLY)) == -1) {
         perror("open");
         return -1;
     }
-    printf("...client fifo opened.\n\n");
+    //printf("...client fifo opened.\n\n");
 
     ReadlnBuffer *rb = (ReadlnBuffer *)calloc(1, sizeof(ReadlnBuffer));
     initRB(0, rb, MAX_BUFFER);
@@ -94,19 +94,19 @@ int main(int argc, char *argv[])
         }
     }
 
-    printf("Closing client fifo...\n");
+    //printf("Closing client fifo...\n");
     if (close(cfifo_fd) == -1) {
         perror("close");
         return -1;
     }
-    printf("...client fifo closed.\n\n");
+    //printf("...client fifo closed.\n\n");
 
-    printf("Closing server fifo...\n");
+    //printf("Closing server fifo...\n");
     if (close(sfifo_fd) == -1) {
         perror("close");
         return -1;
     }
-    printf("...server fifo closed.\n\n");
+    //printf("...server fifo closed.\n\n");
 
     if (unlink(CLIENT) == -1) {
         perror("unlink");
