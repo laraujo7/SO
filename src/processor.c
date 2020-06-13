@@ -65,16 +65,19 @@ int process_execute(char *task)
 {
     int n;
     char *argv[256][256];
+    char *buffer;
 
     char *executing = "Task received\n";
     write(cfifo_fd, executing, strlen(executing));
 
     task = strtok(task, "'");
-    task_add(task);
+    buffer = strdup(task);
     idx_add();
-    n = parse(task, argv);
+    n = parse(buffer, argv);
+    task_add(task, n);
     execute(argv, n);
 
+    free(buffer);
     return 0;
 }
 

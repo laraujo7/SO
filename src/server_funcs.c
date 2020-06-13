@@ -17,7 +17,6 @@ void time_execution(int sec)
 
 int output(int task)
 {
-    
     if (task + 1 > tasks.used) {
         char invalid[34];
         sprintf(invalid, "There's only %d task(s)\n", tasks.used);
@@ -40,7 +39,7 @@ int output(int task)
         perror("read");
         return -1;
     }
-    
+
     char response[idx.size];
 
     if ((log_fd = open("log", O_RDONLY)) == -1) {
@@ -82,6 +81,7 @@ int list_tasks(char type)
         if (!!(type - 'l') == !!task.status) {
             sprintf(line, "#%d%s%s\n", i + 1, status[task.status], task.task);
             strcat(response, line);
+            line[0] = '\0';
         }
     }
 
@@ -98,12 +98,14 @@ int list_tasks(char type)
 
 int terminate(int task_idx)
 {
-    /*
-    if (kill(tasks.list[task_idx].pid, SIGKILL) == -1) {
-        perror("kill");
-        return -1;
+    TASK task = tasks.list[task_idx];
+
+    for (int i = 0; i < task.ncmd; i++) {
+        if (kill(task.pid[i], SIGKILL) == -1) {
+            perror("kill");
+            return -1;
+        }
     }
-    */
 
     tasks.list[task_idx].status = terminated;
 

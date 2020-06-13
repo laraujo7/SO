@@ -1,3 +1,4 @@
+  
 #include "server.h"
 
 int sfifo_fd;
@@ -6,20 +7,18 @@ TASKLIST tasks;
 
 void sigint_handler(int signum)
 {
-    printf("\n\"Unlinking\" server fifo...\n");
     if (unlink(SERVER) == -1) {
         perror("unlink");
         exit(-1);
     }
-    printf("...server fifo \"unlinked\".\n\n");
-
-    printf("Server shutting down.\n");
 
     exit(0);
 }
 
 int main(int argc, char *argv[])
 {
+    int fd;
+
     signal(SIGINT, sigint_handler);
 
     tasks.used = 0; //substituir por init xomxing
@@ -28,6 +27,19 @@ int main(int argc, char *argv[])
         perror("mkfifo");
         return -1;
     }
+
+    if((fd = open("log", O_TRUNC)) == -1){
+        perror("log");
+        return -1;
+    }
+    close(fd);
+
+    if((fd = open("log.idx", O_TRUNC)) == -1){
+        perror("log.idx");
+        return -1;
+    }
+    close(fd);
+
 
     while (1) {
         if ((sfifo_fd = open(SERVER, O_RDONLY)) == -1) {
@@ -44,17 +56,16 @@ int main(int argc, char *argv[])
 
         while (read(sfifo_fd, &request, sizeof(ParsedLine)) > 0) {
             process(request);
-            }
-
+        }
         if (close(cfifo_fd) == -1) {
             perror("close");
             return -1;
         }
+        
         if (close(sfifo_fd) == -1) {
             perror("close");
             return -1;
         }
-
     }
 
     if (unlink(SERVER) == -1) {

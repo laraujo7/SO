@@ -15,8 +15,8 @@
 
 int idx_add();
 int idx_set(int index, int offset, int size);
-void task_add(char *buf);
-int parse(char *buf, char *args[256][256]);
+void task_add(char *buff, int ncmd);
+int parse(char *buff, char *args[256][256]);
 int execute(char *argv[256][256], int n);
 
 #endif //EXECUTE_H

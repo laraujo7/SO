@@ -17,6 +17,7 @@
 typedef enum {running, concluded, max_inactivity, max_execution, terminated} STATUS;
 
 typedef struct task {
+    int ncmd;
     pid_t pid[64];
     STATUS status;
     char *task;

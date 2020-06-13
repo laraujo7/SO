@@ -21,21 +21,21 @@ int execute(char *argv[256][256], int n)
             perror("open");
             return -1;
         }
-        
-        int offsetA = lseek(log_fd, 0, SEEK_END);
 
         for (int i = 0; i < n; i++) {
+            int offsetA;
+
+            if(i == n - 1)
+                offsetA = lseek(log_fd, 0, SEEK_END);
+
             if (i < n - 1)
                 pipe(afterPipe);
 
-            switch (fork()) {
+            switch (tasks.list[tasks.used - 1].pid[i] = fork()) {
             case -1:
                 perror("fork");
                 return -1;
             case 0:
-                dup2(log_fd, STDOUT_FILENO);
-                close(log_fd);
-
                 if (i > 0) {
                     dup2(beforePipe, 0);
                     close(beforePipe);
@@ -45,8 +45,10 @@ int execute(char *argv[256][256], int n)
                     close(afterPipe[0]);
                     close(afterPipe[1]);
                 }
-
-
+                if (i == n - 1) {
+                    dup2(log_fd, STDOUT_FILENO);
+                    close(log_fd);
+                }
                 if (execvp(argv[i][0], argv[i])) {
                     perror("execvp");
                     return -1;
@@ -54,23 +56,22 @@ int execute(char *argv[256][256], int n)
                 break;
             default:
                 wait(&status);
-                if (i == n - 1) {    
+                
+                if (i == n - 1) {
                     int offsetB = lseek(log_fd, 0, SEEK_END);
                     idx_set(tasks.used - 1, offsetA, offsetB - offsetA);
-                    //tasks.list[tasks.used - 1].status = concluded; //SINALLL PORQUE NAO PODE ESTAR DENTRO DO FORK OU NAO AFETA O RESTO
                 }
-            }
 
-            if (i < n - 1)
-                close(afterPipe[1]);
-            if (i > 0)
-                close(beforePipe);
-            beforePipe = afterPipe[0];
+                if (i < n - 1)
+                    close(afterPipe[1]);
+                if (i > 0)
+                    close(beforePipe);
+                beforePipe = afterPipe[0];
+            }
 
 /*
             int interpipe[2];
             pipe(interpipe);
-
             switch (fork()) {
             case -1:
                 perror("fork");
@@ -80,16 +81,13 @@ int execute(char *argv[256][256], int n)
                     //signal(SIGALRM, sendsig);
                     alarm(time_inact);
                 }
-
                 int n;
                 char str[4096];
-
                 while ((n = read(afterPipe[0], str, 4096))) {
                     write(interpipe[1], str, n);
                     if (time_inact > 0)
                         alarm(time_inact);
                 }
-
                 exit(0);
             }
 */
@@ -99,6 +97,7 @@ int execute(char *argv[256][256], int n)
         exit(0);
     }
 
+    tasks.list[tasks.used - 1].status = concluded;
     return 0;
 }
 
@@ -117,7 +116,7 @@ int idx_add()
 int idx_set(int index, int offset, int size)
 {
     int idx_fd;
-    
+
     idx_fd = open("log.idx", O_RDWR);
     lseek(idx_fd, index * sizeof(LOGIDX), SEEK_SET);
 
@@ -125,7 +124,7 @@ int idx_set(int index, int offset, int size)
         .offset = offset,
         .size = size,
     };
-    printf("%d %d\n",idx.offset,idx.size);
+
     write(idx_fd, &idx, sizeof(idx));
 
     close(idx_fd);
@@ -133,10 +132,11 @@ int idx_set(int index, int offset, int size)
     return 0;
 }
 
-void task_add(char *task)
+void task_add(char *task, int ncmd)
 {
-    tasks.list[tasks.used].task = task;
+    tasks.list[tasks.used].task = strdup(task);
     tasks.list[tasks.used].status = running;
+    tasks.list[tasks.used].ncmd = ncmd;
     tasks.used++;
 }
 
@@ -172,7 +172,6 @@ int execute(char *argv[256][256], int n)
     int log_fd;
     int status;
     //pid_t pid;
-
 //    switch (pid = fork()) {
 //        case -1:
 //            perror("fork");
@@ -184,16 +183,12 @@ int execute(char *argv[256][256], int n)
             }
             //dup2(log_fd, 1);
             //close(log_fd);
-
             int idx_fd;
             idx_fd = open("log.idx", O_CREAT | O_WRONLY, 0640);
-
             int offsetA, offsetB;
-
             for (int i = 0; i < n; i++) {
                 if (i < n - 1)
                     pipe(afterPipe);
-
                 switch (fork()) {
                     case -1:
                         perror("fork");
@@ -201,23 +196,19 @@ int execute(char *argv[256][256], int n)
                     case 0:
                         dup2(log_fd, 1);
                         close(log_fd);
-
                         if (i > 0) {
                             dup2(beforePipe, 0);
                             close(beforePipe);
                         }
-
                         if (i < n - 1) {
                             dup2(afterPipe[1], 1);
                             close(afterPipe[0]);
                             close(afterPipe[1]);
                         }
-
                         if (execvp(argv[i][0], argv[i])) {
                             perror("execvp");
                             return -1;
                         }
-
                         break;
                     default:
                         if (i == n -1) {
@@ -228,24 +219,18 @@ int execute(char *argv[256][256], int n)
                             close(idx_fd);
                         }
                 }
-
                 if (i < n - 1)
                     close(afterPipe[1]);
-
                 if (i > 0)
                     close(beforePipe);
-
                 beforePipe = afterPipe[0];
             }
-
 //            _exit(0);
 //        default:
 //            break;
 //            waitpid(-1, NULL, WNOHANG);
 //    }
-
     write(cfifo_fd, "feito I guess\n", 14);
-
     return 0;
 }
 */
