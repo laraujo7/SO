@@ -17,6 +17,7 @@ void time_execution(int sec)
 
 int output(int task)
 {
+    
     if (task + 1 > tasks.used) {
         char invalid[34];
         sprintf(invalid, "There's only %d task(s)\n", tasks.used);
@@ -39,7 +40,7 @@ int output(int task)
         perror("read");
         return -1;
     }
-
+    
     char response[idx.size];
 
     if ((log_fd = open("log", O_RDONLY)) == -1) {

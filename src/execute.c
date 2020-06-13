@@ -21,6 +21,8 @@ int execute(char *argv[256][256], int n)
             perror("open");
             return -1;
         }
+        
+        int offsetA = lseek(log_fd, 0, SEEK_END);
 
         for (int i = 0; i < n; i++) {
             if (i < n - 1)
@@ -43,19 +45,19 @@ int execute(char *argv[256][256], int n)
                     close(afterPipe[0]);
                     close(afterPipe[1]);
                 }
+
+
                 if (execvp(argv[i][0], argv[i])) {
                     perror("execvp");
                     return -1;
                 }
                 break;
             default:
-                if (i == n - 1) {
-                    int offsetA, offsetB;
-                    offsetA = lseek(log_fd, 0, SEEK_END);
-                    wait(&status);
-                    offsetB = lseek(log_fd, 0, SEEK_END);
+                wait(&status);
+                if (i == n - 1) {    
+                    int offsetB = lseek(log_fd, 0, SEEK_END);
                     idx_set(tasks.used - 1, offsetA, offsetB - offsetA);
-                    tasks.list[tasks.used - 1].status = concluded; //SINALLL PORQUE NAO PODE ESTAR DENTRO DO FORK OU NAO AFETA O RESTO
+                    //tasks.list[tasks.used - 1].status = concluded; //SINALLL PORQUE NAO PODE ESTAR DENTRO DO FORK OU NAO AFETA O RESTO
                 }
             }
 
@@ -115,7 +117,7 @@ int idx_add()
 int idx_set(int index, int offset, int size)
 {
     int idx_fd;
-
+    
     idx_fd = open("log.idx", O_RDWR);
     lseek(idx_fd, index * sizeof(LOGIDX), SEEK_SET);
 
@@ -123,7 +125,7 @@ int idx_set(int index, int offset, int size)
         .offset = offset,
         .size = size,
     };
-
+    printf("%d %d\n",idx.offset,idx.size);
     write(idx_fd, &idx, sizeof(idx));
 
     close(idx_fd);

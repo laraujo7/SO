@@ -31,7 +31,7 @@ int process_time_inactivity(char *sec_inact)
     int sec;
 
     sec = (int)strtol(sec_inact, &endptr, 10);
-
+    
     if (sec < 1 || *endptr != '\0') {
         char *invalid = "Invalid inactivity time. Type \"ajuda\" (w/o quotes) for help\n";
         write(cfifo_fd, invalid, strlen(invalid));
