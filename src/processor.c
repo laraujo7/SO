@@ -11,6 +11,10 @@ int process(ParsedLine request)
         case 'm': // tempo execucao
             return process_time_execution(request.arg);
         case 'e': // executar tarefa
+            for (int i = 0; i < tasks.used; i++) {
+                printf("0: %s\n", tasks.list[i].task);
+                fflush(stdout);
+            }
             return process_execute(request.arg);
         case 'o': // output
             return process_output(request.arg);
@@ -63,6 +67,10 @@ int process_time_execution(char *sec_exec)
 
 int process_execute(char *task)
 {
+    for (int i = 0; i < tasks.used; i++) {
+        printf("3: %s\n", tasks.list[i].task);
+        fflush(stdout);
+    }
     int n;
     char *argv[256][256];
 
@@ -70,10 +78,27 @@ int process_execute(char *task)
     write(cfifo_fd, executing, strlen(executing));
 
     task = strtok(task, "'");
-    task_add(task);
+    printf("1: %s\n", task);
+    fflush(stdout);
     idx_add();
     n = parse(task, argv);
+    for (int i = 0; i < tasks.used; i++) {
+        printf("3: %s\n", tasks.list[i].task);
+        fflush(stdout);
+    }
+    puts("");
+    task_add(task, n);
+    for (int i = 0; i < tasks.used; i++) {
+        printf("3: %s\n", tasks.list[i].task);
+        fflush(stdout);
+    }
     execute(argv, n);
+    printf("2: %s\n", tasks.list[tasks.used - 1].task);
+    fflush(stdout);
+    for (int i = 0; i < tasks.used; i++) {
+        printf("3: %s\n", tasks.list[i].task);
+        fflush(stdout);
+    }
 
     return 0;
 }

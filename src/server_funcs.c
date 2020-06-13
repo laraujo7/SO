@@ -65,6 +65,10 @@ int output(int task)
 
 int list_tasks(char type)
 {
+    for (int i = 0; i < tasks.used; i++) {
+        printf("%s", tasks.list[i].task);
+    }
+
     char *status[5] = {
         ": ",
         ", concluida: ",
@@ -81,6 +85,7 @@ int list_tasks(char type)
         if (!!(type - 'l') == !!task.status) {
             sprintf(line, "#%d%s%s\n", i + 1, status[task.status], task.task);
             strcat(response, line);
+            line[0] = '\0';
         }
     }
 
@@ -97,12 +102,14 @@ int list_tasks(char type)
 
 int terminate(int task_idx)
 {
-    /*
-    if (kill(tasks.list[task_idx].pid, SIGKILL) == -1) {
-        perror("kill");
-        return -1;
+    TASK task = tasks.list[task_idx];
+
+    for (int i = 0; i < task.ncmd; i++) {
+        if (kill(task.pid[i], SIGKILL) == -1) {
+            perror("kill");
+            return -1;
+        }
     }
-    */
 
     tasks.list[task_idx].status = terminated;
 

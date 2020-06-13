@@ -12,28 +12,30 @@ int execute(char *argv[256][256], int n)
     int beforePipe = 0;
     int afterPipe[2];
 
-    switch (fork()) {
-    case -1:
-        perror("fork");
-        return -1;
-    case 0:
+    //switch (fork()) {
+    //case -1:
+    //    perror("fork");
+    //    return -1;
+    //case 0:
         if ((log_fd = open("log", O_CREAT | O_APPEND | O_WRONLY, 0666)) == -1) {
             perror("open");
             return -1;
         }
 
         for (int i = 0; i < n; i++) {
+            int offsetA, offsetB;
+
+            if (i == n - 1)
+                offsetA = lseek(log_fd, 0, SEEK_END);
+
             if (i < n - 1)
                 pipe(afterPipe);
 
-            switch (fork()) {
+            switch (tasks.list[tasks.used - 1].pid[i] = fork()) {
             case -1:
                 perror("fork");
                 return -1;
             case 0:
-                dup2(log_fd, STDOUT_FILENO);
-                close(log_fd);
-
                 if (i > 0) {
                     dup2(beforePipe, 0);
                     close(beforePipe);
@@ -43,27 +45,29 @@ int execute(char *argv[256][256], int n)
                     close(afterPipe[0]);
                     close(afterPipe[1]);
                 }
+                if (i == n - 1) {
+                    dup2(log_fd, STDOUT_FILENO);
+                    close(log_fd);
+                }
                 if (execvp(argv[i][0], argv[i])) {
                     perror("execvp");
                     return -1;
                 }
                 break;
             default:
-                if (i == n - 1) {
-                    int offsetA, offsetB;
-                    offsetA = lseek(log_fd, 0, SEEK_END);
-                    wait(&status);
-                    offsetB = lseek(log_fd, 0, SEEK_END);
-                    idx_set(tasks.used - 1, offsetA, offsetB - offsetA);
-                    tasks.list[tasks.used - 1].status = concluded; //SINALLL PORQUE NAO PODE ESTAR DENTRO DO FORK OU NAO AFETA O RESTO
-                }
+                if (i < n - 1)
+                    close(afterPipe[1]);
+                if (i > 0)
+                    close(beforePipe);
+                beforePipe = afterPipe[0];
             }
 
-            if (i < n - 1)
-                close(afterPipe[1]);
-            if (i > 0)
-                close(beforePipe);
-            beforePipe = afterPipe[0];
+            if (i == n - 1) {
+                wait(&status);
+                offsetB = lseek(log_fd, 0, SEEK_END);
+                idx_set(tasks.used - 1, offsetA, offsetB - offsetA);
+                tasks.list[tasks.used - 1].status = concluded; //SINALLL PORQUE NAO PODE ESTAR DENTRO DO FORK OU NAO AFETA O RESTO
+            }
 
 /*
             int interpipe[2];
@@ -94,8 +98,8 @@ int execute(char *argv[256][256], int n)
         }
 
         close(log_fd);
-        exit(0);
-    }
+    //    exit(0);
+    //}
 
     return 0;
 }
@@ -131,10 +135,11 @@ int idx_set(int index, int offset, int size)
     return 0;
 }
 
-void task_add(char *task)
+void task_add(char *task, int ncmd)
 {
     tasks.list[tasks.used].task = task;
     tasks.list[tasks.used].status = running;
+    tasks.list[tasks.used].ncmd = ncmd;
     tasks.used++;
 }
 
