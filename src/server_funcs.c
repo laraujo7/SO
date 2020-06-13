@@ -17,7 +17,13 @@ void time_execution(int sec)
 
 int output(int task)
 {
-    task--;
+    if (task + 1 > tasks.used) {
+        char invalid[34];
+        sprintf(invalid, "There's only %d task(s)\n", tasks.used);
+        write(cfifo_fd, invalid, strlen(invalid));
+        return 0;
+    }
+
     int idx_fd, log_fd;
     LOGIDX idx;
 
@@ -67,17 +73,19 @@ int list_tasks(char type)
         ", terminada: "
     };
 
-    char response[4096];
+    char response[4096] = "";
     char line[4096];
 
     for (int i = 0; i < tasks.used; i++) {
         TASK task = tasks.list[i];
         if (!!(type - 'l') == !!task.status) {
-            printf("-> %s|\n", task.task);
             sprintf(line, "#%d%s%s\n", i + 1, status[task.status], task.task);
             strcat(response, line);
         }
     }
+
+    if (*response == '\0')
+        sprintf(response, "No tasks %s\n", type - 'l' ? "done" : "running");
 
     if (write(cfifo_fd, response, strlen(response)) == -1) {
         perror("write");
@@ -87,17 +95,19 @@ int list_tasks(char type)
     return 0;
 }
 
-int terminate_task(int task)
+int terminate(int task_idx)
 {
-    if (kill(tasks.list[task].pid, SIGKILL) == -1) {
+    /*
+    if (kill(tasks.list[task_idx].pid, SIGKILL) == -1) {
         perror("kill");
         return -1;
     }
+    */
 
-    tasks.list[task].status = terminated;
+    tasks.list[task_idx].status = terminated;
 
     char response[29];
-    sprintf(response, "Task %d terminated\n", task);
+    sprintf(response, "Task %d terminated\n", task_idx + 1);
     write(cfifo_fd, response, strlen(response));
 
     return 0;
@@ -105,7 +115,7 @@ int terminate_task(int task)
 
 int help()
 {
-    char *help = "tempo-inactividade segs\ntempo-execucao segs\nexecutar p1 | p2 ... | pn\nlistar\nterminar n\nhistorico\noutput n\najuda\n";
+    char *help = "tempo-inactividade segs\ntempo-execucao segs\nexecutar p1 | p2 ... | pn\nlistar\nterminar n\nhistorico\noutput n\najuda\nsegs > 0 && n > 0\n";
 
     if (write(cfifo_fd, help, strlen(help)) == -1) {
         perror("write");

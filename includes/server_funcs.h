@@ -22,7 +22,7 @@ void time_inactivity(int sec);
 void time_execution(int sec);
 int output(int task);
 int list_tasks(char type);
-int terminate_task(int task);
+int terminate(int task);
 int help();
 
 #endif //SERVER_FUNCS_H
