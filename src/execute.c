@@ -76,8 +76,6 @@ int execute(char *argv[256][256], int n)
         char index[16];
         sprintf(index, "%d", tasks.used);
 
-        printf("BLM: %s\n", index);
-
         int signal_pipe_fd = open("signal_pipe", O_CREAT | O_TRUNC | O_WRONLY, 0640);
         write(signal_pipe_fd, index, strlen(index));
         close(signal_pipe_fd);

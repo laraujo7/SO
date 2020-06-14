@@ -11,11 +11,8 @@ void sigchld_handler(int signum)
     int signal_pipe_fd = open("signal_pipe", O_RDONLY, 0640);
     read(signal_pipe_fd, index, 16);
 
-    printf("I WAS HERE MFS\n");
-
     int task_idx = 0;
     task_idx = atoi(index);
-    printf("I WAS HERE MFS %d\n", task_idx);
 
     tasks.list[task_idx - 1].status = concluded;
 }
