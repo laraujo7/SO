@@ -73,7 +73,9 @@ int execute(char *argv[256][256], int n)
 
         }
 
+        
         close(log_fd);
+
         exit(0);
     }
 
@@ -103,7 +105,7 @@ int idx_set(int index, int offset, int size)
         .offset = offset,
         .size = size,
     };
-
+    printf("%d %d\n",idx.offset,idx.size);
     write(idx_fd, &idx, sizeof(idx));
 
     close(idx_fd);

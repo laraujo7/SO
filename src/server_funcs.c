@@ -101,6 +101,7 @@ int terminate(int task_idx)
     TASK task = tasks.list[task_idx];
 
     for (int i = 0; i < task.ncmd; i++) {
+        printf("task_idx: %d -> (%d,%d)\n",task_idx,tasks.used,task.pid[i]);
         if (kill(task.pid[i], SIGKILL) == -1) {
             perror("kill");
             return -1;

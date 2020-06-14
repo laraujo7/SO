@@ -3,11 +3,14 @@
 
 int sfifo_fd;
 int cfifo_fd;
+int task_terminated;
 TASKLIST tasks;
 
 
 void sigchld_handler(int signum){
 
+    //saber quem é q esta a acabar
+    printf("tarefa concluida -> %d\n",tasks.used -1);
     tasks.list[tasks.used - 1].status = concluded;
     
 }
@@ -38,13 +41,13 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    if((fd = open("log", O_TRUNC)) == -1){
+    if((fd = open("log", O_CREAT | O_TRUNC, 0666)) == -1){
         perror("log");
         return -1;
     }
     close(fd);
 
-    if((fd = open("log.idx", O_TRUNC)) == -1){
+    if((fd = open("log.idx", O_CREAT, O_TRUNC, 0666)) == -1){
         perror("log.idx");
         return -1;
     }
