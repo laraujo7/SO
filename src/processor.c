@@ -94,6 +94,13 @@ int process_output(char *task_idx)
         return -1;
     }
 
+    if (tasks.list[index].status == running) {
+        char notyet[35];
+        sprintf(notyet, "Task %d is still running\n", index + 1);
+        write(cfifo_fd, notyet, strlen(notyet));
+        return -1;
+    }
+
     return output(index);
 }
 
@@ -114,6 +121,13 @@ int process_terminate(char *task_idx)
         char invalid[34];
         sprintf(invalid, "There's only %d task(s)\n", tasks.used);
         write(cfifo_fd, invalid, strlen(invalid));
+        return -1;
+    }
+
+    if (tasks.list[index - 1].status != running) {
+        char notyet[33];
+        sprintf(notyet, "Task %d wasn't running\n", index);
+        write(cfifo_fd, notyet, strlen(notyet));
         return -1;
     }
 
