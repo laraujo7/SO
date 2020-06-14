@@ -8,15 +8,12 @@ void sigchld_handler(int signum)
 {
     wait(NULL);
 
-    char index[16];
+    int index;
 
-    int signal_pipe_fd = open("signal_pipe", O_RDONLY, 0640);
-    read(signal_pipe_fd, index, 16);
+    int signal_pipe_fd = open("signal_file", O_RDONLY, 0640);
+    read(signal_pipe_fd, &index, sizeof(int));
 
-    int task_idx = 0;
-    task_idx = atoi(index);
-
-    tasks.list[task_idx - 1].status = concluded;
+    tasks.list[index - 1].status = concluded;
 }
 
 void sigint_handler(int signum)

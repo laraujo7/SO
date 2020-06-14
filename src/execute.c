@@ -83,11 +83,8 @@ int execute(char *argv[256][256], int n)
 
         close(log_fd);
 
-        char index[16];
-        sprintf(index, "%d", tasks.used);
-
-        int signal_pipe_fd = open("signal_pipe", O_CREAT | O_TRUNC | O_WRONLY, 0640);
-        write(signal_pipe_fd, index, strlen(index));
+        int signal_pipe_fd = open("signal_file", O_CREAT | O_TRUNC | O_WRONLY, 0640);
+        write(signal_pipe_fd, &tasks.used, sizeof(int));
         close(signal_pipe_fd);
 
         unlink(pids_file);
