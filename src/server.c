@@ -6,6 +6,8 @@ TASKLIST tasks;
 
 void sigchld_handler(int signum)
 {
+    wait(NULL);
+
     char index[16];
 
     int signal_pipe_fd = open("signal_pipe", O_RDONLY, 0640);
@@ -41,8 +43,6 @@ void sigint_handler(int signum)
 int main(int argc, char *argv[])
 {
     signal(SIGINT, sigint_handler);
-
-    signal(SIGCHLD, sigchld_handler);
 
     tasks.used = 0; //substituir por init xomxing
 
