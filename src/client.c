@@ -91,6 +91,24 @@ int main(int argc, char *argv[])
             write(1, invalid, strlen(invalid));
         } else {
             write(sfifo_fd, &pl, sizeof(ParsedLine));
+            char response[4096];
+            ssize_t bytes_output;
+
+            do {
+                if ((bytes_output = read(cfifo_fd, &response, 4096)) == -1) {
+                    perror("read");
+                    return -1;
+                }
+                if (write(STDOUT_FILENO, response, bytes_output) == -1) {
+                    perror("write");
+                    return -1;
+                }
+            } while (bytes_output == 4096);
+
+            if (bytes_output == -1) {
+                perror("read");
+                return -1;
+            }
         }
     }
 

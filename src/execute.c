@@ -62,8 +62,9 @@ int execute(char *argv[256][256], int n)
                 beforePipe = afterPipe[0];
             }
 
+            wait(&status);
+
             if (i == n - 1) {
-                wait(&status);
                 offsetB = lseek(log_fd, 0, SEEK_END);
                 idx_set(tasks.used - 1, offsetA, offsetB - offsetA);
                 tasks.list[tasks.used - 1].status = concluded; //SINALLL PORQUE NAO PODE ESTAR DENTRO DO FORK OU NAO AFETA O RESTO

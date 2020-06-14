@@ -52,13 +52,7 @@ int main(int argc, char *argv[])
         while (read(sfifo_fd, &request, sizeof(ParsedLine)) > 0) {
             printf("Request received:\n\topt: %c\n\targ: %s\n\n", request.opt, request.arg);
             printf("Processing request...\n");
-            for (int i = 0; i < tasks.used; i++) {
-                printf("-1: %s\n", tasks.list[i].task);
-            }
             process(request);
-            for (int i = 0; i < tasks.used; i++) {
-                printf("-2: %s\n", tasks.list[i].task);
-            }
             printf("...request processed.\n\n");
             printf("Waiting for client input...\n\n");
         }
