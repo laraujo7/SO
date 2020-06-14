@@ -9,7 +9,7 @@ TASKLIST tasks;
 void sigchld_handler(int signum){
 
     tasks.list[tasks.used - 1].status = concluded;
-    exit(0);
+    
 }
 
 void sigint_handler(int signum)
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
     signal(SIGINT, sigint_handler);
 
-    //signal(SIGCHLD, sigchld_handler);
+    signal(SIGCHLD, sigchld_handler);
 
     tasks.used = 0; //substituir por init xomxing
 
@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
 
 
     while (1) {
+        
         if ((sfifo_fd = open(SERVER, O_RDONLY)) == -1) {
             perror("open");
             return -1;
@@ -65,9 +66,9 @@ int main(int argc, char *argv[])
         ParsedLine request;
 
         while (read(sfifo_fd, &request, sizeof(ParsedLine)) > 0) {
-            printf("coisas\n");
             process(request);
         }
+
         if (close(cfifo_fd) == -1) {
             perror("close");
             return -1;

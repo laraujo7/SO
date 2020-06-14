@@ -18,7 +18,7 @@ int execute(char *argv[256][256], int n)
     case 0:
 
         signal(SIGCHLD,SIG_IGN);
-        
+
         if ((log_fd = open("log", O_CREAT | O_APPEND | O_WRONLY, 0666)) == -1) {
             perror("open");
             return -1;
@@ -77,7 +77,6 @@ int execute(char *argv[256][256], int n)
         exit(0);
     }
 
-    //tasks.list[tasks.used - 1].status = concluded;
     return 0;
 }
 
