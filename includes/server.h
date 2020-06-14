@@ -28,4 +28,7 @@ typedef struct tasklist {
     TASK list[4096];
 } TASKLIST;
 
+void sigchld_handler(int signum);
+void sigint_handler(int signum);
+
 #endif //SERVER_H

@@ -31,7 +31,7 @@ int process_time_inactivity(char *sec_inact)
     int sec;
 
     sec = (int)strtol(sec_inact, &endptr, 10);
-
+    
     if (sec < 1 || *endptr != '\0') {
         char *invalid = "Invalid inactivity time. Type \"ajuda\" (w/o quotes) for help\n";
         write(cfifo_fd, invalid, strlen(invalid));
@@ -65,20 +65,19 @@ int process_execute(char *task)
 {
     int n;
     char *argv[256][256];
-    printf("HEYOU\n");
-    fflush(stdout);
+    char *buffer;
 
     char *executing = "Task received\n";
     write(cfifo_fd, executing, strlen(executing));
 
-    printf("HEYOU\n");
-    fflush(stdout);
     task = strtok(task, "'");
+    buffer = strdup(task);
     idx_add();
-    n = parse(task, argv);
+    n = parse(buffer, argv);
     task_add(task, n);
     execute(argv, n);
 
+    free(buffer);
     return 0;
 }
 
@@ -111,6 +110,13 @@ int process_terminate(char *task_idx)
         return -1;
     }
 
-    //return terminate(index);
-    return 0;
+    if(index > tasks.used){
+        char invalid[34];
+        sprintf(invalid, "There's only %d task(s)\n", tasks.used);
+        write(cfifo_fd, invalid, strlen(invalid));
+        return -1;
+    } 
+
+    return terminate(index);
+    
 }
