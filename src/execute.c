@@ -16,7 +16,6 @@ int execute(char *argv[256][256], int n)
         perror("fork");
         return -1;
     case 0:
-
         signal(SIGCHLD,SIG_IGN);
 
         if ((log_fd = open("log", O_CREAT | O_APPEND | O_WRONLY, 0666)) == -1) {
@@ -73,6 +72,16 @@ int execute(char *argv[256][256], int n)
         }
 
         close(log_fd);
+
+        char index[16];
+        sprintf(index, "%d", tasks.used);
+
+        printf("BLM: %s\n", index);
+
+        int signal_pipe_fd = open("signal_pipe", O_CREAT | O_TRUNC | O_WRONLY, 0640);
+        write(signal_pipe_fd, index, strlen(index));
+        close(signal_pipe_fd);
+
         exit(0);
     }
 
