@@ -16,6 +16,9 @@ int execute(char *argv[256][256], int n)
         perror("fork");
         return -1;
     case 0:
+
+        signal(SIGCHLD,SIG_IGN);
+        
         if ((log_fd = open("log", O_CREAT | O_APPEND | O_WRONLY, 0666)) == -1) {
             perror("open");
             return -1;
@@ -74,7 +77,7 @@ int execute(char *argv[256][256], int n)
         exit(0);
     }
 
-    tasks.list[tasks.used - 1].status = concluded;
+    //tasks.list[tasks.used - 1].status = concluded;
     return 0;
 }
 
@@ -101,7 +104,7 @@ int idx_set(int index, int offset, int size)
         .offset = offset,
         .size = size,
     };
-    printf("%d %d\n",idx.offset, idx.size);
+
     write(idx_fd, &idx, sizeof(idx));
 
     close(idx_fd);

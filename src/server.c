@@ -6,6 +6,11 @@ int cfifo_fd;
 TASKLIST tasks;
 
 
+void sigchld_handler(int signum){
+
+    tasks.list[tasks.used - 1].status = concluded;
+    exit(0);
+}
 
 void sigint_handler(int signum)
 {
@@ -22,6 +27,8 @@ int main(int argc, char *argv[])
     int fd;
 
     signal(SIGINT, sigint_handler);
+
+    //signal(SIGCHLD, sigchld_handler);
 
     tasks.used = 0; //substituir por init xomxing
 
@@ -58,6 +65,7 @@ int main(int argc, char *argv[])
         ParsedLine request;
 
         while (read(sfifo_fd, &request, sizeof(ParsedLine)) > 0) {
+            printf("coisas\n");
             process(request);
         }
         if (close(cfifo_fd) == -1) {
