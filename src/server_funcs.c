@@ -21,7 +21,7 @@ int output(int task)
         char invalid[34];
         sprintf(invalid, "There's only %d task(s)\n", tasks.used);
         write(cfifo_fd, invalid, strlen(invalid));
-        return 0;
+        return -1;
     }
 
     int idx_fd, log_fd;

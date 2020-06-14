@@ -15,6 +15,9 @@ void sigint_handler(int signum)
 
 int main(int argc, char *argv[])
 {
+    char response[4096];
+    ssize_t bytes_output;
+
     signal(SIGINT, sigint_handler);
 
     if (mkfifo(CLIENT, 0666) == -1) {
@@ -53,9 +56,6 @@ int main(int argc, char *argv[])
                     return -1;
                 }
 
-                char response[4096];
-                ssize_t bytes_output;
-
                 do {
                     if ((bytes_output = read(cfifo_fd, &response, 4096)) == -1) {
                         perror("read");
@@ -75,14 +75,22 @@ int main(int argc, char *argv[])
         }
     } else {
         pl.opt = argv[1][1];
-        //pl->arg = argv[2];
         strcpy(pl.arg, argv[2]);
-
+        
         if (validate(argv[1], &pl) == -1) {
             char *invalid = "Invalid comand use \"ajuda\" (option -h) for help\n";
             write(1, invalid, strlen(invalid));
         } else {
             write(sfifo_fd, &pl, sizeof(ParsedLine));
+        }
+
+        if ((bytes_output = read(cfifo_fd, &response, 4096)) == -1) {
+            perror("read");
+            return -1;
+        }
+        if (write(STDOUT_FILENO, response, bytes_output) == -1) {
+            perror("write");
+            return -1;
         }
     }
 

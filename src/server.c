@@ -5,6 +5,8 @@ int sfifo_fd;
 int cfifo_fd;
 TASKLIST tasks;
 
+
+
 void sigint_handler(int signum)
 {
     if (unlink(SERVER) == -1) {
@@ -24,6 +26,7 @@ int main(int argc, char *argv[])
     tasks.used = 0; //substituir por init xomxing
 
     if (mkfifo(SERVER, 0666) == -1) {
+        unlink(SERVER);
         perror("mkfifo");
         return -1;
     }

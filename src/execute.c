@@ -8,7 +8,6 @@ extern TASKLIST tasks;
 int execute(char *argv[256][256], int n)
 {
     int log_fd;
-    int status;
     int beforePipe = 0;
     int afterPipe[2];
 
@@ -25,8 +24,9 @@ int execute(char *argv[256][256], int n)
         for (int i = 0; i < n; i++) {
             int offsetA;
 
-            if(i == n - 1)
+            if(i == n - 1){
                 offsetA = lseek(log_fd, 0, SEEK_END);
+            }
 
             if (i < n - 1)
                 pipe(afterPipe);

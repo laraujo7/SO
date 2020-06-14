@@ -110,6 +110,13 @@ int process_terminate(char *task_idx)
         return -1;
     }
 
-    //return terminate(index);
-    return 0;
+    if(index > tasks.used){
+        char invalid[34];
+        sprintf(invalid, "There's only %d task(s)\n", tasks.used);
+        write(cfifo_fd, invalid, strlen(invalid));
+        return -1;
+    } 
+
+    return terminate(index);
+    
 }
