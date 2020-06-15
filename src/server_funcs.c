@@ -1,7 +1,7 @@
 #include "argus.h"
 
 int time_inact;
-int time_exec;
+extern int time_exec;
 extern TASKLIST tasks;
 extern int cfifo_fd;
 
@@ -10,10 +10,6 @@ void time_inactivity(int sec)
     time_inact = sec;
 }
 
-void time_execution(int sec)
-{
-    time_exec = sec;
-}
 
 int output(int task)
 {
@@ -37,6 +33,12 @@ int output(int task)
     }
     if (read(idx_fd, &idx, sizeof(LOGIDX)) == -1) {
         perror("read");
+        return -1;
+    }
+
+    if(idx.size == 0) {
+        char* invalid = "No output\n";
+        write(cfifo_fd,invalid,strlen(invalid));
         return -1;
     }
 
@@ -114,6 +116,7 @@ int terminate(int task_idx)
             return -1;
         }
     }
+    signal(SIGCHLD, sigchld_handler);
 
     tasks.list[task_idx - 1].status = terminated;
 

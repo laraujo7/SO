@@ -3,6 +3,7 @@
 int sfifo_fd;
 int cfifo_fd;
 
+
 void sigint_handler(int signum)
 {
     if (unlink(CLIENT) == -1) {

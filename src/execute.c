@@ -64,6 +64,7 @@ int execute(char *argv[256][256], int n)
                 }
                 break;
             default:
+
                 if (i < n - 1)
                     close(afterPipe[1]);
                 if (i > 0)
@@ -76,10 +77,15 @@ int execute(char *argv[256][256], int n)
             close(pids_fd);
 
             if (i == n - 1) {
-                waitpid(tasks.list[tasks.used - 1].pid[i],NULL,0);
+                waitpid(pids[i],NULL,0);
                 int offsetB = lseek(log_fd, 0, SEEK_END);
                 idx_set(tasks.used - 1, offsetA, offsetB - offsetA);
             }
+        }
+
+        if(time_exec > 0){
+            signal(SIGALRM,sigalrm_handler);
+            alarm(time_exec);
         }
 
         close(log_fd);

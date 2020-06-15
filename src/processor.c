@@ -2,6 +2,7 @@
 
 extern TASKLIST tasks;
 extern int cfifo_fd;
+extern int time_exec;
 
 int process(ParsedLine request)
 {
@@ -49,14 +50,17 @@ int process_time_execution(char *sec_exec)
     int sec;
 
     sec = (int)strtol(sec_exec, &endptr, 10);
-
+    
     if (sec < 1 || *endptr != '\0') {
         char *invalid = "Invalid execution time. Type \"ajuda\" (w/o quotes) for help\n";
         write(cfifo_fd, invalid, strlen(invalid));
         return -1;
     }
 
-    time_execution(sec);
+    char* valid = "Execution time updated\n";
+    write(cfifo_fd,valid,strlen(valid));
+
+    time_exec = sec;
 
     return 0;
 }

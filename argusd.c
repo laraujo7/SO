@@ -2,7 +2,22 @@
 
 int sfifo_fd;
 int cfifo_fd;
+int time_exec;
 TASKLIST tasks;
+
+
+void sigalrm_handler(int signum){
+
+    int index;
+
+    int signal_pipe_fd = open(SIGNAL_FILE, O_RDONLY);    
+    read(signal_pipe_fd, &index, sizeof(int));
+    
+    terminate(index);
+
+    tasks.list[index - 1].status = max_execution;
+}
+
 
 void sigchld_handler(int signum)
 {
@@ -13,7 +28,8 @@ void sigchld_handler(int signum)
     int signal_pipe_fd = open(SIGNAL_FILE, O_RDONLY);    
     read(signal_pipe_fd, &index, sizeof(int));
 
-    tasks.list[index - 1].status = concluded;
+    if(tasks.list[index - 1].status == running)
+        tasks.list[index - 1].status = concluded;
 }
 
 void sigint_handler(int signum)
@@ -47,7 +63,8 @@ int main(int argc, char *argv[])
     signal(SIGINT, sigint_handler);
 
     tasks.used = 0; //substituir por init xomxing
-
+    time_exec = 0;
+    
     if (mkfifo(SERVER, 0666) == -1) {
         return -1;
     }

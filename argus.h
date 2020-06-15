@@ -9,9 +9,6 @@
 #include <signal.h>
 #include <string.h>
 #include <fcntl.h>
-
-#include <limits.h>
-
 #include <stdio.h>
 
 #define BUFFSIZE 256
@@ -65,6 +62,7 @@ int help();
 
 void sigchld_handler(int signum);
 void sigint_handler(int signum);
+void sigalrm_handler(int signum);
 
 
 int idx_add();
