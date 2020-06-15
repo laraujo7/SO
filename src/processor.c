@@ -1,5 +1,4 @@
-  
-#include "processor.h"
+#include "argus.h"
 
 extern TASKLIST tasks;
 extern int cfifo_fd;
@@ -32,7 +31,7 @@ int process_time_inactivity(char *sec_inact)
     int sec;
 
     sec = (int)strtol(sec_inact, &endptr, 10);
-    
+
     if (sec < 1 || *endptr != '\0') {
         char *invalid = "Invalid inactivity time. Type \"ajuda\" (w/o quotes) for help\n";
         write(cfifo_fd, invalid, strlen(invalid));
@@ -95,6 +94,13 @@ int process_output(char *task_idx)
         return -1;
     }
 
+    if (tasks.list[index].status == running) {
+        char notyet[35];
+        sprintf(notyet, "Task %d is still running\n", index + 1);
+        write(cfifo_fd, notyet, strlen(notyet));
+        return -1;
+    }
+
     return output(index);
 }
 
@@ -103,7 +109,7 @@ int process_terminate(char *task_idx)
     char *endptr;
     int index;
 
-    index = (int)strtol(task_idx, &endptr, 10) - 1;
+    index = (int)strtol(task_idx, &endptr, 10);
 
     if (index < 0 || *endptr != '\0') {
         char *invalid = "Invalid task index. Type \"ajuda\" (w/o quotes) for help\n";
@@ -111,13 +117,19 @@ int process_terminate(char *task_idx)
         return -1;
     }
 
-    if(index > tasks.used){
+    if (index > tasks.used) {
         char invalid[34];
         sprintf(invalid, "There's only %d task(s)\n", tasks.used);
         write(cfifo_fd, invalid, strlen(invalid));
         return -1;
-    } 
+    }
+
+    if (tasks.list[index - 1].status != running) {
+        char notyet[33];
+        sprintf(notyet, "Task %d wasn't running\n", index);
+        write(cfifo_fd, notyet, strlen(notyet));
+        return -1;
+    }
 
     return terminate(index);
-    
 }

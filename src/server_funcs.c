@@ -1,4 +1,4 @@
-#include "server_funcs.h"
+#include "argus.h"
 
 int time_inact;
 int time_exec;
@@ -27,7 +27,7 @@ int output(int task)
     int idx_fd, log_fd;
     LOGIDX idx;
 
-    if ((idx_fd = open("log.idx", O_RDONLY)) == -1) {
+    if ((idx_fd = open(LOG_IDX, O_RDONLY)) == -1) {
         perror("open");
         return -1;
     }
@@ -42,7 +42,7 @@ int output(int task)
 
     char response[idx.size];
 
-    if ((log_fd = open("log", O_RDONLY)) == -1) {
+    if ((log_fd = open(LOG, O_RDONLY)) == -1) {
         perror("open");
         return -1;
     }
@@ -98,20 +98,30 @@ int list_tasks(char type)
 
 int terminate(int task_idx)
 {
-    TASK task = tasks.list[task_idx];
+    int pids[256];
 
-    for (int i = 0; i < task.ncmd; i++) {
-        if (kill(task.pid[i], SIGKILL) == -1) {
+    char pids_file[16];
+    sprintf(pids_file, "tmp%d", task_idx);
+
+    int pids_fd = open(pids_file, O_RDONLY);
+    read(pids_fd, pids, sizeof(pids));
+    close(pids_fd);
+
+    signal(SIGCHLD, SIG_IGN);
+    for (int i = 0; i < tasks.list[task_idx - 1].ncmd; i++) {
+        if (kill(pids[i], SIGKILL) == -1) {
             perror("kill");
             return -1;
         }
     }
 
-    tasks.list[task_idx].status = terminated;
+    tasks.list[task_idx - 1].status = terminated;
 
     char response[29];
-    sprintf(response, "Task %d terminated\n", task_idx + 1);
+    sprintf(response, "Task %d terminated\n", task_idx);
     write(cfifo_fd, response, strlen(response));
+
+    unlink(pids_file);
 
     return 0;
 }

@@ -1,4 +1,4 @@
-#include "execute.h"
+#include "argus.h"
 
 extern int cfifo_fd;
 extern int time_inact;
@@ -7,22 +7,29 @@ extern TASKLIST tasks;
 
 int execute(char *argv[256][256], int n)
 {
-    int log_fd;
+    int log_fd, pids_fd;
     int beforePipe = 0;
     int afterPipe[2];
 
+    signal(SIGCHLD, sigchld_handler);
+    
     switch (fork()) {
     case -1:
         perror("fork");
         return -1;
     case 0:
-        signal(SIGCHLD,SIG_IGN);
+        signal(SIGCHLD, SIG_IGN);
 
-        if ((log_fd = open("log", O_CREAT | O_APPEND | O_WRONLY, 0666)) == -1) {
+        int pids[256];
+
+        char pids_file[16];
+        sprintf(pids_file, "tmp%d", tasks.used);
+
+        if ((log_fd = open(LOG, O_CREAT | O_APPEND | O_WRONLY, 0666)) == -1) {
             perror("open");
             return -1;
         }
-
+    
         for (int i = 0; i < n; i++) {
             int offsetA;
 
@@ -33,7 +40,7 @@ int execute(char *argv[256][256], int n)
             if (i < n - 1)
                 pipe(afterPipe);
 
-            switch (tasks.list[tasks.used - 1].pid[i] = fork()) {
+            switch (pids[i] = fork()) {
             case -1:
                 perror("fork");
                 return -1;
@@ -64,6 +71,10 @@ int execute(char *argv[256][256], int n)
                 beforePipe = afterPipe[0];
             }
 
+            pids_fd = open(pids_file, O_CREAT | O_WRONLY, 0640);
+            write(pids_fd, pids, sizeof(pids));
+            close(pids_fd);
+
             if (i == n - 1) {
                 waitpid(tasks.list[tasks.used - 1].pid[i],NULL,0);
                 int offsetB = lseek(log_fd, 0, SEEK_END);
@@ -73,14 +84,11 @@ int execute(char *argv[256][256], int n)
 
         close(log_fd);
 
-        char index[16];
-        sprintf(index, "%d", tasks.used);
-
-        printf("BLM: %s\n", index);
-
-        int signal_pipe_fd = open("signal_pipe", O_CREAT | O_TRUNC | O_WRONLY, 0640);
-        write(signal_pipe_fd, index, strlen(index));
+        int signal_pipe_fd = open(SIGNAL_FILE, O_CREAT | O_TRUNC | O_WRONLY, 0640);
+        write(signal_pipe_fd, &tasks.used, sizeof(int));
         close(signal_pipe_fd);
+
+        unlink(pids_file);
 
         exit(0);
     }
@@ -93,7 +101,7 @@ int idx_add()
     int idx_fd;
     LOGIDX idx;
 
-    idx_fd = open("log.idx", O_CREAT | O_APPEND | O_WRONLY, 0640);
+    idx_fd = open(LOG_IDX, O_CREAT | O_APPEND | O_WRONLY, 0640);
     write(idx_fd, &idx, sizeof(LOGIDX));
     close(idx_fd);
 
@@ -104,7 +112,7 @@ int idx_set(int index, int offset, int size)
 {
     int idx_fd;
 
-    idx_fd = open("log.idx", O_RDWR);
+    idx_fd = open(LOG_IDX, O_RDWR);
     lseek(idx_fd, index * sizeof(LOGIDX), SEEK_SET);
 
     LOGIDX idx = {

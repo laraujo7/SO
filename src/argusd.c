@@ -1,5 +1,4 @@
-  
-#include "server.h"
+#include "argus.h"
 
 int sfifo_fd;
 int cfifo_fd;
@@ -7,16 +6,14 @@ TASKLIST tasks;
 
 void sigchld_handler(int signum)
 {
-    char index[16];
+    wait(NULL);
 
-    int signal_pipe_fd = open("signal_pipe", O_RDONLY, 0640);
-    read(signal_pipe_fd, index, 16);
+    int index;
 
-    int task_idx = 0;
-    task_idx = atoi(index);
+    int signal_pipe_fd = open(SIGNAL_FILE, O_RDONLY);    
+    read(signal_pipe_fd, &index, sizeof(int));
 
-
-    tasks.list[task_idx - 1].status = concluded;
+    tasks.list[index - 1].status = concluded;
 }
 
 void sigint_handler(int signum)
@@ -25,17 +22,22 @@ void sigint_handler(int signum)
         exit(-1);
     }
 
+    if (unlink(SIGNAL_FILE) == -1) {
+        exit(-1);
+    }
+
     int fd;
 
-    if ((fd = open("log", O_TRUNC)) == -1) {
+    if ((fd = open(LOG, O_TRUNC)) == -1) {
         exit(-1);
     }
     close(fd);
 
-    if ((fd = open("log.idx", O_TRUNC)) == -1) {
+    if ((fd = open(LOG_IDX, O_TRUNC)) == -1) {
         exit(-1);
     }
     close(fd);
+    
 
     exit(0);
 }
@@ -44,12 +46,9 @@ int main(int argc, char *argv[])
 {
     signal(SIGINT, sigint_handler);
 
-    signal(SIGCHLD, sigchld_handler);
-
     tasks.used = 0; //substituir por init xomxing
 
     if (mkfifo(SERVER, 0666) == -1) {
-        unlink(SERVER);
         return -1;
     }
 

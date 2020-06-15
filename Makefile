@@ -7,10 +7,9 @@ BIN_DIR = bin
 BLD_DIR = build
 DOC_DIR = docs
 INC_DIR = includes
-OUT_DIR = out
 SRC_DIR = src
 TST_DIR = scripts
-TARGETS = cl sv
+TARGETS = argus argusd
 
 .DEFAULT_GOAL = all
 
@@ -21,17 +20,17 @@ all: checkdirs $(TARGETS)
 $(BLD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) -c $(INCLDS) $(CFLAGS) $< -o $@
 
-cl: $(BLD_DIR)/parsed_line.o
-	$(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/client.c $^
+argus: $(BLD_DIR)/parsed_line.o
+	   $(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/argus.c $^
 
-sv: $(BLD_DIR)/server_funcs.o $(BLD_DIR)/execute.o $(BLD_DIR)/processor.o
-	$(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/server.c $^
+argusd: $(BLD_DIR)/server_funcs.o $(BLD_DIR)/execute.o $(BLD_DIR)/processor.o
+		$(CC) $(INCLDS) $(CFLAGS) -o $(BIN_DIR)/$@ $(SRC_DIR)/argusd.c $^
 
-start_sv: all
-	./$(BIN_DIR)/sv
+start_argusd: all
+	./$(BIN_DIR)/argusd
 
-start_cl: all
-	./$(BIN_DIR)/cl
+start_argus: all
+	./$(BIN_DIR)/argus
 
 stop:
 	kill -s SIGTERM $(shell pidof sv)
@@ -58,4 +57,11 @@ checkdirs:
 	@mkdir -p $(BIN_DIR)
 	@mkdir -p $(BLD_DIR)
 	@mkdir -p $(DOC_DIR)
-	@mkdir -p $(OUT_DIR)
+	@mkdir -p $(TST_DIR)
+
+clean:
+	@echo "Cleaning..."
+	@echo ""
+	@-rm -r $(BLD_DIR)/* $(BIN_DIR)/* $(TST_DIR)/* tmp* *fifo signal_file log log.idx
+	@echo ""
+	@echo "...✓ done!"

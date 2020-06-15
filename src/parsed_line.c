@@ -1,4 +1,4 @@
-#include "../includes/parsed_line.h"
+#include "argus.h"
 
 // Valerá a pena dividir esta função em duas, comando e opção, para simplificar estes if statements e aproveitar o facto de as opçoes serem apenas um char? (utilizar switch)
 // A cena de alinhar os || foi só para facilitar a leitura. Se não for divido em duas funções põe-se isso direito outra vez.
