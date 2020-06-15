@@ -84,7 +84,11 @@ int execute(char *argv[256][256], int n)
 
         close(log_fd);
 
+<<<<<<< HEAD
         int signal_pipe_fd = open(SIGNAL_FILE, O_CREAT | O_TRUNC | O_WRONLY, 0640);
+=======
+        int signal_pipe_fd = open("signal_file", O_CREAT | O_TRUNC | O_WRONLY, 0640);
+>>>>>>> 2f10b9957658b51bc0e57dfa8614f80d9cffb383
         write(signal_pipe_fd, &tasks.used, sizeof(int));
         close(signal_pipe_fd);
 

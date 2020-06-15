@@ -60,4 +60,4 @@ log.idx
 idx
 idx.c
 
-signal_pipe
+signal_file
