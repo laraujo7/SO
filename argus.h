@@ -20,7 +20,6 @@
 #define SIGNAL_FILE "signal_file"
 
 typedef enum {running, concluded, max_inactivity, max_execution, terminated} STATUS;
-
 typedef enum {false, true} bool;
 
 typedef struct logidx {
