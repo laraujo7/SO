@@ -1,6 +1,6 @@
 CC      = gcc
 LD      = gcc
-CFLAGS  = -O2 -Wall -Wextra -g
+CFLAGS  = -O2 -Wall -Wextra
 CFLAGS += -Wno-unused-parameter -Wno-unused-function -Wno-unused-result
 INCLDS  = -I $(INC_DIR)
 BLD_DIR = build
@@ -51,12 +51,10 @@ check: all
 
 checkdirs:
 	@mkdir -p $(BLD_DIR)
-	@mkdir -p $(DOC_DIR)
-	@mkdir -p $(TST_DIR)
 
 clean:
 	@echo "Cleaning..."
 	@echo ""
-	@-rm -r $(BLD_DIR)/* $(TST_DIR)/* tmp* *fifo signal_file log log.idx
+	@-rm -r $(BLD_DIR) tmp* *fifo signal_file log log.idx argus argusd
 	@echo ""
 	@echo "...✓ done!"

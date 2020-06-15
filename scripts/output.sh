@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # Start sever
-# ./bin/sv &
+./argusd &
+sleep 1
 
 # Commands execution
-./bin/cl -e "ls"
+./argus -e "ls"
 ls > gol
 
 [ "$(diff log gol)" ] && echo "False" || echo "True"
