@@ -29,8 +29,14 @@ int execute(char *argv[256][256], int n)
             perror("open");
             return -1;
         }
+
+        //if(time_exec > 0) {
+        //    signal(SIGALRM,sigalrm_handler);
+        //    alarm(time_exec);
+        //}
     
         for (int i = 0; i < n; i++) {
+
             int offsetA;
 
             if(i == n - 1){
@@ -70,31 +76,25 @@ int execute(char *argv[256][256], int n)
                 if (i > 0)
                     close(beforePipe);
                 beforePipe = afterPipe[0];
-            }
 
-            pids_fd = open(pids_file, O_CREAT | O_WRONLY, 0640);
-            write(pids_fd, pids, sizeof(pids));
-            close(pids_fd);
+                pids_fd = open(pids_file, O_CREAT | O_WRONLY, 0640);
+                write(pids_fd, pids, sizeof(pids));
+                close(pids_fd);
 
-            if (i == n - 1) {
-                waitpid(pids[i],NULL,0);
-                int offsetB = lseek(log_fd, 0, SEEK_END);
-                idx_set(tasks.used - 1, offsetA, offsetB - offsetA);
+                if (i == n - 1) {
+                    waitpid(pids[i],NULL,0);
+                    int offsetB = lseek(log_fd, 0, SEEK_END);
+                    idx_set(tasks.used - 1, offsetA, offsetB - offsetA);
+                }
             }
         }
-
-        if(time_exec > 0){
-            signal(SIGALRM,sigalrm_handler);
-            alarm(time_exec);
-        }
-
-        close(log_fd);
-
-
+        
         int signal_pipe_fd = open(SIGNAL_FILE, O_CREAT | O_TRUNC | O_WRONLY, 0640);
 
         write(signal_pipe_fd, &tasks.used, sizeof(int));
         close(signal_pipe_fd);
+
+        close(log_fd);
 
         unlink(pids_file);
 

@@ -120,10 +120,6 @@ int terminate(int task_idx)
 
     tasks.list[task_idx - 1].status = terminated;
 
-    char response[29];
-    sprintf(response, "Task %d terminated\n", task_idx);
-    write(cfifo_fd, response, strlen(response));
-
     unlink(pids_file);
 
     return 0;

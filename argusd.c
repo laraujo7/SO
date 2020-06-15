@@ -7,14 +7,12 @@ TASKLIST tasks;
 
 
 void sigalrm_handler(int signum){
-
     int index;
 
-    int signal_pipe_fd = open(SIGNAL_FILE, O_RDONLY);    
+    int signal_pipe_fd = open(SIGNAL_FILE, O_RDONLY);
     read(signal_pipe_fd, &index, sizeof(int));
-    
-    terminate(index);
 
+    terminate(index);
     tasks.list[index - 1].status = max_execution;
 }
 
@@ -25,11 +23,14 @@ void sigchld_handler(int signum)
 
     int index;
 
-    int signal_pipe_fd = open(SIGNAL_FILE, O_RDONLY);    
+    int signal_pipe_fd = open(SIGNAL_FILE, O_RDONLY);
     read(signal_pipe_fd, &index, sizeof(int));
 
-    if(tasks.list[index - 1].status == running)
+    printf("pid: %d - status: %d\n",getpid(),tasks.list[index - 1].status);
+
+    if(tasks.list[index - 1].status == running){
         tasks.list[index - 1].status = concluded;
+    }
 }
 
 void sigint_handler(int signum)

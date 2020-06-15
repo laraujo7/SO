@@ -134,6 +134,12 @@ int process_terminate(char *task_idx)
         write(cfifo_fd, notyet, strlen(notyet));
         return -1;
     }
+    
+    terminate(index);
 
-    return terminate(index);
+    char response[29];
+    sprintf(response, "Task %d terminated\n", index);
+    write(cfifo_fd, response, strlen(response));
+
+    return 0;
 }
